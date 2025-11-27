@@ -1,2 +1,3 @@
-# DCL_2025_Saki-Chan-no-inu
-出滑的狗
+# DCL_2025_team9: Tetris
+
+組長: 黃奕淇
