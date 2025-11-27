@@ -1,3 +1,9 @@
 # DCL_2025_team9: Tetris
 
-Team members: 113550025 邱元廣 113550108 黃彥棨 113550148 黃奕淇 113550109 謝亞序
+## Team Members
+| Student ID | Name      | Role      |
+|------------|-----------|-----------|
+| 113550025  | Chiu Yuan-Kuang |        |
+| 113550108  | Huang Yen-Chi   |        |
+| 113550148  | Huang Yi-Chi    | Leader |
+| 113550109  | Hsieh Ya-Hsu    |        |
