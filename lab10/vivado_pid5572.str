@@ -260,3 +260,6 @@ dismissDialog("Program Device"); // aT (dialog2)
 // Tcl Message: INFO: [Labtools 27-1434] Device xc7a35t (JTAG device index = 0) is programmed with a design that has no supported debug core(s) in it. 
 // 'E' command handler elapsed time: 22 seconds
 dismissDialog("Program Device"); // bk (Program Device Progress)
+// WARNING: HSwingWorker (Update Runs Swing Worker) is taking 1555 ms. Increasing delay to 3000 ms.
+// [GUI Memory]: 164 MB (+471kb) [00:27:44]
+// HMemoryUtils.trashcanNow. Engine heap size: 1,141 MB. GUI used memory: 87 MB. Current time: 11/28/25, 11:07:02 AM CST
