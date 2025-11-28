@@ -1,0 +1,24 @@
+#-----------------------------------------------------------
+# Vivado v2025.1 (64-bit)
+# SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
+# IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
+# SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
+# Start of session at: Fri Nov 28 10:32:53 2025
+# Process ID         : 11236
+# Current directory  : C:/Users/Shlab_21/Desktop/DCL_2025_team9/lab10/lab10.runs/synth_1
+# Command line       : vivado.exe -log lab10.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source lab10.tcl
+# Log file           : C:/Users/Shlab_21/Desktop/DCL_2025_team9/lab10/lab10.runs/synth_1/lab10.vds
+# Journal file       : C:/Users/Shlab_21/Desktop/DCL_2025_team9/lab10/lab10.runs/synth_1\vivado.jou
+# Running On         : Shlab21
+# Platform           : Windows Server 2016 or Windows 10
+# Operating System   : 26100
+# Processor Detail   : Intel(R) Core(TM) i5-8400 CPU @ 2.80GHz
+# CPU Frequency      : 2808 MHz
+# CPU Physical cores : 6
+# CPU Logical cores  : 6
+# Host memory        : 17056 MB
+# Swap memory        : 1073 MB
+# Total Virtual      : 18130 MB
+# Available Virtual  : 9403 MB
+#-----------------------------------------------------------
+source lab10.tcl -notrace
