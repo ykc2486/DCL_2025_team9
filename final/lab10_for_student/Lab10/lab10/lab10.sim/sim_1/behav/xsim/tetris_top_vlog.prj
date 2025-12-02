@@ -1,0 +1,14 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  --include "C:/Xilinx/2025.1/Vivado/data/rsb/busdef" \
+"../../../../lab10.srcs/sources_1/clk_divider.v" \
+"../../../../lab10.srcs/sources_1/new/score_gen.v" \
+"../../../../lab10.srcs/sources_1/sram.v" \
+"../../../../lab10.srcs/sources_1/new/tetris_core.v" \
+"../../../../lab10.srcs/sources_1/vga_sync.v" \
+"../../../../lab10.srcs/sources_1/lab10.v" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort

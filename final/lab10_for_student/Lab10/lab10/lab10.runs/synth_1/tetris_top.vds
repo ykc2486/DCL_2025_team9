@@ -1,0 +1,38 @@
+#-----------------------------------------------------------
+# Vivado v2025.1 (64-bit)
+# SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
+# IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
+# SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
+# Start of session at: Tue Dec  2 19:45:40 2025
+# Process ID         : 24828
+# Current directory  : D:/digital_design/final/lab10_for_student/Lab10/lab10/lab10.runs/synth_1
+# Command line       : vivado.exe -log tetris_top.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source tetris_top.tcl
+# Log file           : D:/digital_design/final/lab10_for_student/Lab10/lab10/lab10.runs/synth_1/tetris_top.vds
+# Journal file       : D:/digital_design/final/lab10_for_student/Lab10/lab10/lab10.runs/synth_1\vivado.jou
+# Running On         : HYHwilliam
+# Platform           : Windows Server 2016 or Windows 10
+# Operating System   : 26200
+# Processor Detail   : Intel(R) Core(TM) Ultra 7 258V
+# CPU Frequency      : 3302 MHz
+# CPU Physical cores : 8
+# CPU Logical cores  : 8
+# Host memory        : 33805 MB
+# Swap memory        : 2147 MB
+# Total Virtual      : 35953 MB
+# Available Virtual  : 14676 MB
+#-----------------------------------------------------------
+source tetris_top.tcl -notrace
+create_project: Time (s): cpu = 00:00:11 ; elapsed = 00:00:09 . Memory (MB): peak = 498.789 ; gain = 212.629
+Command: read_checkpoint -auto_incremental -incremental D:/digital_design/final/lab10_for_student/Lab10/lab10/lab10.srcs/utils_1/imports/synth_1/lab10.dcp
+INFO: [Vivado 12-5825] Read reference checkpoint from D:/digital_design/final/lab10_for_student/Lab10/lab10/lab10.srcs/utils_1/imports/synth_1/lab10.dcp for incremental synthesis
+INFO: [Vivado 12-7989] Please ensure there are no constraint changes
+Command: synth_design -top tetris_top -part xc7a35ticsg324-1L
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7a35ti'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7a35ti'
+INFO: [Device 21-403] Loading part xc7a35ticsg324-1L
+INFO: [Designutils 20-5440] No compile time benefit to using incremental synthesis; A full resynthesis will be run
+INFO: [Designutils 20-4379] Flow is switching to default flow due to incremental criteria not met. If you would like to alter this behaviour and have the flow terminate instead, please set the following parameter config_implementation {autoIncr.Synth.RejectBehavior Terminate}
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 2 processes.
+INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
+INFO: [Synth 8-7075] Helper process launched with PID 22504

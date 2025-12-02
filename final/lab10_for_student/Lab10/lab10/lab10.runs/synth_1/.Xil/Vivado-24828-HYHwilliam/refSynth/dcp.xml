@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<Checkpoint Version="24" Minor="0">
+	<BUILD_NUMBER Name="6140274"/>
+	<FULL_BUILD Name="SW Build 6140274 on Thu May 22 00:12:29 MDT 2025"/>
+	<PRODUCT Name="Vivado v2025.1 (64-bit)"/>
+	<Part Name="xc7a35ticsg324-1L"/>
+	<FeatureSet Name="FeatureSet_Classic"/>
+	<NEXTGEN_VERSAL Name="0"/>
+	<BoardPart Name="digilentinc.com:arty:part0:1.1"/>
+	<Top Name="tetris_top"/>
+	<DisableAutoIOBuffers Name="0"/>
+	<OutOfContext Name="0"/>
+	<MacroLevel Name="1"/>
+	<RunGenerated Name="1"/>
+	<HDPlatform Name="0"/>
+	<File Type="VERILOG_STUB" Name="tetris_top_stub.v" ModTime="1764674948"/>
+	<File Type="VHDL_STUB" Name="tetris_top_stub.vhdl" ModTime="1764674948"/>
+	<File Type="PARAMXML" Name="tetris_top_param.xml" ModTime="1764674948"/>
+	<File Type="PARAMXML" Name="tetris_top_param.xml" ModTime="1764674948"/>
+	<File Type="SHAPE" Name="tetris_top.shape" ModTime="1764674948"/>
+	<File Type="XN" Name="tetris_top.xn" ModTime="1764674948"/>
+	<File Type="EDIF" Name="tetris_top.edf" ModTime="1764674948"/>
+	<File Type="INCR" Name="tetris_top.incr" ModTime="1764674948"/>
+	<File Type="RDA" Name="tetris_top.rda" ModTime="1764674948"/>
+	<File Type="JSON_RDA" Name="tetris_top_rda.json" ModTime="1764674948"/>
+	<File Type="WDF" Name="tetris_top.wdf" ModTime="1764674948"/>
+	<File Type="SYNTH" Name="tetris_top.synth" ModTime="1764674948"/>
+</Checkpoint>
+
