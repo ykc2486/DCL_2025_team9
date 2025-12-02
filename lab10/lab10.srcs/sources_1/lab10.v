@@ -133,9 +133,7 @@ end
 // Note that the width x height of the fish image is 64x32, when scaled-up
 // on the screen, it becomes 128x64. 'pos' specifies the right edge of the
 // fish image.
-assign fish_region =
-           pixel_y >= (FISH_VPOS<<1) && pixel_y < (FISH_VPOS+FISH_H)<<1 &&
-           (pixel_x + 127) >= pos && pixel_x < pos + 1;
+assign fish_region = 0;
 
 always @ (posedge clk) begin
   if (~reset_n)
@@ -163,6 +161,7 @@ always @(*) begin
     rgb_next = 12'h000; // Synchronization period, must set RGB values to zero.
   else
     rgb_next = data_out; // RGB value at (pixel_x, pixel_y)
+
 end
 // End of the video data display code.
 // ------------------------------------------------------------------------

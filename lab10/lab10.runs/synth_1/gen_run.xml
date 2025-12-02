@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GenRun Id="synth_1" LaunchPart="xc7a35ticsg324-1L" LaunchTime="1764297171">
+<GenRun Id="synth_1" LaunchPart="xc7a35ticsg324-1L" LaunchTime="1764674413" LaunchIncrCheckpoint="$PSRCDIR/utils_1/imports/synth_1/lab10.dcp">
   <File Type="PA-TCL" Name="lab10.tcl"/>
-  <File Type="RDS-PROPCONSTRS" Name="lab10_drc_synth.rpt"/>
   <File Type="REPORTS-TCL" Name="lab10_reports.tcl"/>
   <File Type="RDS-RDS" Name="lab10.vds"/>
+  <File Type="RDS-PROPCONSTRS" Name="lab10_drc_synth.rpt"/>
   <File Type="RDS-UTIL" Name="lab10_utilization_synth.rpt"/>
   <File Type="RDS-UTIL-PB" Name="lab10_utilization_synth.pb"/>
   <File Type="RDS-DCP" Name="lab10.dcp"/>
@@ -65,6 +65,14 @@
   </FileSet>
   <FileSet Name="utils" Type="Utils" RelSrcDir="$PSRCDIR/utils_1" RelGenDir="$PGENDIR/utils_1">
     <Filter Type="Utils"/>
+    <File Path="$PSRCDIR/utils_1/imports/synth_1/lab10.dcp">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedInSteps" Val="synth_1"/>
+        <Attr Name="AutoDcp" Val="1"/>
+      </FileInfo>
+    </File>
     <Config>
       <Option Name="TopAutoSet" Val="TRUE"/>
     </Config>

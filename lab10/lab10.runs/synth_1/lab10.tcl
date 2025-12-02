@@ -4,7 +4,7 @@
 
 set TIME_start [clock seconds] 
 namespace eval ::optrace {
-  variable script "C:/Users/Shlab_21/Desktop/DCL_2025_team9/lab10/lab10.runs/synth_1/lab10.tcl"
+  variable script "C:/Users/Shlab_17/DCL_2025_team9/lab10/lab10.runs/synth_1/lab10.tcl"
   variable category "vivado_synth"
 }
 
@@ -56,27 +56,29 @@ if {$::dispatch::connected} {
 }
 
 OPTRACE "synth_1" START { ROLLUP_AUTO }
+set_param chipscope.maxJobs 4
 set_param general.usePosixSpawnForFork 1
+set_param xicom.use_bs_reader 1
 OPTRACE "Creating in-memory project" START { }
 create_project -in_memory -part xc7a35ticsg324-1L
 
 set_param project.singleFileAddWarning.threshold 0
 set_param project.compositeFile.enableAutoGeneration 0
 set_param synth.vivado.isSynthRun true
-set_property webtalk.parent_dir C:/Users/Shlab_21/Desktop/DCL_2025_team9/lab10/lab10.cache/wt [current_project]
-set_property parent.project_path C:/Users/Shlab_21/Desktop/DCL_2025_team9/lab10/lab10.xpr [current_project]
+set_property webtalk.parent_dir C:/Users/Shlab_17/DCL_2025_team9/lab10/lab10.cache/wt [current_project]
+set_property parent.project_path C:/Users/Shlab_17/DCL_2025_team9/lab10/lab10.xpr [current_project]
 set_property default_lib xil_defaultlib [current_project]
 set_property target_language Verilog [current_project]
-set_property ip_output_repo c:/Users/Shlab_21/Desktop/DCL_2025_team9/lab10/lab10.cache/ip [current_project]
+set_property ip_output_repo c:/Users/Shlab_17/DCL_2025_team9/lab10/lab10.cache/ip [current_project]
 set_property ip_cache_permissions {read write} [current_project]
 OPTRACE "Creating in-memory project" END { }
 OPTRACE "Adding files" START { }
-read_mem C:/Users/Shlab_21/Desktop/DCL_2025_team9/lab10/lab10.srcs/sources_1/images.mem
+read_mem C:/Users/Shlab_17/DCL_2025_team9/lab10/lab10.srcs/sources_1/images.mem
 read_verilog -library xil_defaultlib {
-  C:/Users/Shlab_21/Desktop/DCL_2025_team9/lab10/lab10.srcs/sources_1/clk_divider.v
-  C:/Users/Shlab_21/Desktop/DCL_2025_team9/lab10/lab10.srcs/sources_1/sram.v
-  C:/Users/Shlab_21/Desktop/DCL_2025_team9/lab10/lab10.srcs/sources_1/vga_sync.v
-  C:/Users/Shlab_21/Desktop/DCL_2025_team9/lab10/lab10.srcs/sources_1/lab10.v
+  C:/Users/Shlab_17/DCL_2025_team9/lab10/lab10.srcs/sources_1/clk_divider.v
+  C:/Users/Shlab_17/DCL_2025_team9/lab10/lab10.srcs/sources_1/sram.v
+  C:/Users/Shlab_17/DCL_2025_team9/lab10/lab10.srcs/sources_1/vga_sync.v
+  C:/Users/Shlab_17/DCL_2025_team9/lab10/lab10.srcs/sources_1/lab10.v
 }
 OPTRACE "Adding files" END { }
 # Mark all dcp files as not used in implementation to prevent them from being
@@ -87,10 +89,12 @@ OPTRACE "Adding files" END { }
 foreach dcp [get_files -quiet -all -filter file_type=="Design\ Checkpoint"] {
   set_property used_in_implementation false $dcp
 }
-read_xdc C:/Users/Shlab_21/Desktop/DCL_2025_team9/lab10/lab10.srcs/constrs_1/lab10.xdc
-set_property used_in_implementation false [get_files C:/Users/Shlab_21/Desktop/DCL_2025_team9/lab10/lab10.srcs/constrs_1/lab10.xdc]
+read_xdc C:/Users/Shlab_17/DCL_2025_team9/lab10/lab10.srcs/constrs_1/lab10.xdc
+set_property used_in_implementation false [get_files C:/Users/Shlab_17/DCL_2025_team9/lab10/lab10.srcs/constrs_1/lab10.xdc]
 
 set_param ips.enableIPCacheLiteLoad 1
+
+read_checkpoint -auto_incremental -incremental C:/Users/Shlab_17/DCL_2025_team9/lab10/lab10.srcs/utils_1/imports/synth_1/lab10.dcp
 close [open __synthesis_is_running__ w]
 
 OPTRACE "synth_design" START { }
