@@ -4,7 +4,7 @@ module score_gen(
     input signed [9:0] rel_y,
     output reg seg_on
 );
-    parameter W=20, H=40, T=3;
+    parameter W=20, H=30, T=3;
     reg [6:0] s;
     
     always @(*) begin

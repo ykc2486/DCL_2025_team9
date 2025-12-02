@@ -1,8 +1,8 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version              : Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
-| Date                      : Tue Dec  2 20:50:27 2025
-| Host                      : HYHwilliam running 64-bit major release  (build 9200)
+| Date                      : Tue Dec  2 21:57:26 2025
+| Host                      : Shlab17 running 64-bit major release  (build 9200)
 | Command                   : report_io -file tetris_top_io_placed.rpt
 | Design                    : tetris_top
 | Device                    : xc7a35ti

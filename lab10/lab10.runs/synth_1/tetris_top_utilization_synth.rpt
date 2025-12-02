@@ -1,8 +1,8 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
-| Date         : Tue Dec  2 20:49:26 2025
-| Host         : HYHwilliam running 64-bit major release  (build 9200)
+| Date         : Tue Dec  2 21:56:46 2025
+| Host         : Shlab17 running 64-bit major release  (build 9200)
 | Command      : report_utilization -file tetris_top_utilization_synth.rpt -pb tetris_top_utilization_synth.pb
 | Design       : tetris_top
 | Device       : xc7a35ticsg324-1L
@@ -31,14 +31,14 @@ Table of Contents
 +-------------------------+------+-------+------------+-----------+-------+
 |        Site Type        | Used | Fixed | Prohibited | Available | Util% |
 +-------------------------+------+-------+------------+-----------+-------+
-| Slice LUTs*             | 6945 |     0 |          0 |     20800 | 33.39 |
-|   LUT as Logic          | 6945 |     0 |          0 |     20800 | 33.39 |
+| Slice LUTs*             | 6831 |     0 |          0 |     20800 | 32.84 |
+|   LUT as Logic          | 6831 |     0 |          0 |     20800 | 32.84 |
 |   LUT as Memory         |    0 |     0 |          0 |      9600 |  0.00 |
-| Slice Registers         |  913 |     0 |          0 |     41600 |  2.19 |
-|   Register as Flip Flop |  913 |     0 |          0 |     41600 |  2.19 |
+| Slice Registers         |  917 |     0 |          0 |     41600 |  2.20 |
+|   Register as Flip Flop |  917 |     0 |          0 |     41600 |  2.20 |
 |   Register as Latch     |    0 |     0 |          0 |     41600 |  0.00 |
-| F7 Muxes                |  455 |     0 |          0 |     16300 |  2.79 |
-| F8 Muxes                |   27 |     0 |          0 |      8150 |  0.33 |
+| F7 Muxes                |  426 |     0 |          0 |     16300 |  2.61 |
+| F8 Muxes                |   33 |     0 |          0 |      8150 |  0.40 |
 +-------------------------+------+-------+------------+-----------+-------+
 * Warning! The Final LUT count, after physical optimizations and full implementation, is typically lower. Run opt_design after synthesis, if not already completed, for a more realistic count.
 Warning! LUT value is adjusted to account for LUT combining.
@@ -60,7 +60,7 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 | 0     |          Yes |           - |          Set |
 | 92    |          Yes |           - |        Reset |
 | 5     |          Yes |         Set |            - |
-| 816   |          Yes |       Reset |            - |
+| 820   |          Yes |       Reset |            - |
 +-------+--------------+-------------+--------------+
 
 
@@ -151,18 +151,18 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 +----------+------+---------------------+
 | Ref Name | Used | Functional Category |
 +----------+------+---------------------+
-| LUT6     | 3979 |                 LUT |
-| LUT2     | 1785 |                 LUT |
-| LUT3     |  896 |                 LUT |
-| LUT5     |  856 |                 LUT |
-| FDRE     |  816 |        Flop & Latch |
+| LUT6     | 3990 |                 LUT |
+| LUT2     | 1794 |                 LUT |
+| LUT3     |  984 |                 LUT |
+| FDRE     |  820 |        Flop & Latch |
+| LUT5     |  701 |                 LUT |
 | CARRY4   |  622 |          CarryLogic |
-| MUXF7    |  455 |               MuxFx |
-| LUT4     |  368 |                 LUT |
-| LUT1     |  170 |                 LUT |
+| MUXF7    |  426 |               MuxFx |
+| LUT4     |  300 |                 LUT |
+| LUT1     |  151 |                 LUT |
 | FDCE     |   92 |        Flop & Latch |
 | RAMB36E1 |   37 |        Block Memory |
-| MUXF8    |   27 |               MuxFx |
+| MUXF8    |   33 |               MuxFx |
 | OBUF     |   14 |                  IO |
 | IBUF     |    7 |                  IO |
 | FDSE     |    5 |        Flop & Latch |

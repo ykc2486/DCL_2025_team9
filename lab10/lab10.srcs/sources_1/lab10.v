@@ -19,28 +19,29 @@ module tetris_top(
     localparam TEX_H = 20;
     
     // 遊戲區位置與大小
-    localparam OFF_X = 220;
-    localparam OFF_Y = 40;
+    localparam OFF_X = 240;
+    localparam OFF_Y = 30;
     localparam GAME_W = 200; // 10 cols * 20
     localparam GAME_H = 400; // 20 rows * 20
 
-    // 0. 時脈生成 (100MHz -> 50MHz)
+    // VGA clock generation
     wire vga_clk;
     clk_divider#(2) cd0 (.clk(clk), .reset(~reset_n), .clk_out(vga_clk));
 
-    // 1. SRAM 控制 (旋轉鍵觸發寫入，平時唯讀)
+    // SRAM controll variable
     wire mem_we = usr_sw[3]; 
     wire mem_en = 1'b1;     
     wire [11:0] zero_data = 12'h0;
 
-    // 訊號
+    // system variable
     wire video_on, p_tick;
     wire [9:0] pixel_x, pixel_y;
     wire [3:0] btn_clean;
     
     wire [2:0] core_blk_id; 
     wire [7:0] core_score;
-
+    
+    // address declaration
     reg  [16:0] addr_bg;
     reg  [11:0] addr_blk;
     wire [11:0] data_bg;    
@@ -65,8 +66,7 @@ module tetris_top(
     wire [4:0] tex_u = (in_game_region) ? (pixel_x - OFF_X) % 20 : 0;
     wire [4:0] tex_v = (in_game_region) ? (pixel_y - OFF_Y) % 20 : 0;
 
-    // --- 模組實例化 ---
-
+    // Modules
     vga_sync vs0 (
         .clk(vga_clk), .reset(~reset_n), 
         .visible(video_on), .p_tick(p_tick),
@@ -100,8 +100,8 @@ module tetris_top(
     wire [9:0] sx = pixel_x;
     wire [9:0] sy = pixel_y;
     wire s_on_hun, s_on_ten, s_on_unit;
-    localparam SC_X = 460;
-    localparam SC_Y = 150;
+    localparam SC_X = 490;
+    localparam SC_Y = 125;
     
     score_gen g1 (.digit((core_score/100)%10), .rel_x(sx - SC_X),      .rel_y(sy - SC_Y), .seg_on(s_on_hun));
     score_gen g2 (.digit((core_score/10)%10),  .rel_x(sx - SC_X - 30), .rel_y(sy - SC_Y), .seg_on(s_on_ten));
