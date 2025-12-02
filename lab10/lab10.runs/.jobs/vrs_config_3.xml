@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Runs Version="1" Minor="0">
-	<Run Id="synth_1" LaunchDir="C:/Users/Shlab_17/DCL_2025_team9/lab10/lab10.runs/synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
-	<Run Id="impl_1" LaunchDir="C:/Users/Shlab_17/DCL_2025_team9/lab10/lab10.runs/impl_1" FlowId="Vivado_Implementation" FromStepId="init_design" ToStepId="write_bitstream">
+	<Run Id="synth_1" LaunchDir="D:/digital_design/lab10_for_student/lab10_for_student/Lab10/lab10/lab10.runs/synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Run Id="impl_1" LaunchDir="D:/digital_design/lab10_for_student/lab10_for_student/Lab10/lab10/lab10.runs/impl_1" FlowId="Vivado_Implementation" FromStepId="init_design" ToStepId="write_bitstream">
 		<Parent Id="synth_1"/>
 	</Run>
 	<Parameters>

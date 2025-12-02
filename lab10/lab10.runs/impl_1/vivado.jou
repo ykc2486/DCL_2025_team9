@@ -3,22 +3,22 @@
 # SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
 # IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
 # SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
-# Start of session at: Tue Dec  2 19:20:53 2025
-# Process ID         : 17492
-# Current directory  : C:/Users/Shlab_17/DCL_2025_team9/lab10/lab10.runs/impl_1
-# Command line       : vivado.exe -log lab10.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source lab10.tcl -notrace
-# Log file           : C:/Users/Shlab_17/DCL_2025_team9/lab10/lab10.runs/impl_1/lab10.vdi
-# Journal file       : C:/Users/Shlab_17/DCL_2025_team9/lab10/lab10.runs/impl_1\vivado.jou
-# Running On         : Shlab17
+# Start of session at: Tue Dec  2 20:49:35 2025
+# Process ID         : 15296
+# Current directory  : D:/digital_design/final/lab10_for_student/Lab10/lab10/lab10.runs/impl_1
+# Command line       : vivado.exe -log tetris_top.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source tetris_top.tcl -notrace
+# Log file           : D:/digital_design/final/lab10_for_student/Lab10/lab10/lab10.runs/impl_1/tetris_top.vdi
+# Journal file       : D:/digital_design/final/lab10_for_student/Lab10/lab10/lab10.runs/impl_1\vivado.jou
+# Running On         : HYHwilliam
 # Platform           : Windows Server 2016 or Windows 10
-# Operating System   : 26100
-# Processor Detail   : AMD Ryzen 7 5700                               
-# CPU Frequency      : 3693 MHz
+# Operating System   : 26200
+# Processor Detail   : Intel(R) Core(TM) Ultra 7 258V
+# CPU Frequency      : 3302 MHz
 # CPU Physical cores : 8
-# CPU Logical cores  : 16
-# Host memory        : 17041 MB
-# Swap memory        : 1073 MB
-# Total Virtual      : 18115 MB
-# Available Virtual  : 8689 MB
+# CPU Logical cores  : 8
+# Host memory        : 33805 MB
+# Swap memory        : 2147 MB
+# Total Virtual      : 35953 MB
+# Available Virtual  : 14564 MB
 #-----------------------------------------------------------
-source lab10.tcl -notrace
+source tetris_top.tcl -notrace

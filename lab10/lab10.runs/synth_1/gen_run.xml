@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GenRun Id="synth_1" LaunchPart="xc7a35ticsg324-1L" LaunchTime="1764674413" LaunchIncrCheckpoint="$PSRCDIR/utils_1/imports/synth_1/lab10.dcp">
-  <File Type="PA-TCL" Name="lab10.tcl"/>
-  <File Type="REPORTS-TCL" Name="lab10_reports.tcl"/>
-  <File Type="RDS-RDS" Name="lab10.vds"/>
-  <File Type="RDS-PROPCONSTRS" Name="lab10_drc_synth.rpt"/>
-  <File Type="RDS-UTIL" Name="lab10_utilization_synth.rpt"/>
-  <File Type="RDS-UTIL-PB" Name="lab10_utilization_synth.pb"/>
-  <File Type="RDS-DCP" Name="lab10.dcp"/>
-  <File Type="VDS-TIMINGSUMMARY" Name="lab10_timing_summary_synth.rpt"/>
-  <File Type="VDS-TIMING-PB" Name="lab10_timing_summary_synth.pb"/>
+<GenRun Id="synth_1" LaunchPart="xc7a35ticsg324-1L" LaunchTime="1764679630" LaunchIncrCheckpoint="$PSRCDIR/utils_1/imports/synth_1/lab10.dcp">
+  <File Type="PA-TCL" Name="tetris_top.tcl"/>
+  <File Type="REPORTS-TCL" Name="tetris_top_reports.tcl"/>
+  <File Type="RDS-RDS" Name="tetris_top.vds"/>
+  <File Type="RDS-PROPCONSTRS" Name="tetris_top_drc_synth.rpt"/>
+  <File Type="RDS-UTIL" Name="tetris_top_utilization_synth.rpt"/>
+  <File Type="RDS-UTIL-PB" Name="tetris_top_utilization_synth.pb"/>
+  <File Type="RDS-DCP" Name="tetris_top.dcp"/>
+  <File Type="VDS-TIMINGSUMMARY" Name="tetris_top_timing_summary_synth.rpt"/>
+  <File Type="VDS-TIMING-PB" Name="tetris_top_timing_summary_synth.pb"/>
   <FileSet Name="sources" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1" RelGenDir="$PGENDIR/sources_1">
     <Filter Type="Srcs"/>
     <File Path="$PSRCDIR/sources_1/clk_divider.v">
@@ -18,7 +18,28 @@
         <Attr Name="UsedIn" Val="simulation"/>
       </FileInfo>
     </File>
+    <File Path="$PSRCDIR/sources_1/new/debounce.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/score_gen.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
     <File Path="$PSRCDIR/sources_1/sram.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/tetris_core.v">
       <FileInfo>
         <Attr Name="UsedIn" Val="synthesis"/>
         <Attr Name="UsedIn" Val="implementation"/>
@@ -45,9 +66,15 @@
         <Attr Name="UsedIn" Val="simulation"/>
       </FileInfo>
     </File>
+    <File Path="$PSRCDIR/sources_1/new/blocks.mem">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
     <Config>
       <Option Name="DesignMode" Val="RTL"/>
-      <Option Name="TopModule" Val="lab10"/>
+      <Option Name="TopModule" Val="tetris_top"/>
       <Option Name="TopAutoSet" Val="TRUE"/>
     </Config>
   </FileSet>

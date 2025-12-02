@@ -25,7 +25,7 @@ else
 fi
 export LD_LIBRARY_PATH
 
-HD_PWD='C:/Users/Shlab_17/DCL_2025_team9/lab10/lab10.runs/impl_1'
+HD_PWD='D:/digital_design/final/lab10_for_student/Lab10/lab10/lab10.runs/impl_1'
 cd "$HD_PWD"
 
 HD_LOG=runme.log
@@ -43,6 +43,6 @@ EAStep()
 
 # pre-commands:
 /bin/touch .init_design.begin.rst
-EAStep vivado -log lab10.vdi -applog -m64 -product Vivado -messageDb vivado.pb -mode batch -source lab10.tcl -notrace
+EAStep vivado -log tetris_top.vdi -applog -m64 -product Vivado -messageDb vivado.pb -mode batch -source tetris_top.tcl -notrace
 
 
