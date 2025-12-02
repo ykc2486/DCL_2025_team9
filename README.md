@@ -1,7 +1,5 @@
 # DCL_2025_team9: Tetris
 
-# For the newest project go to **final** directory
-
 ## Team Members
 | Student ID | Name      | Role      | Position |
 |------------|-----------|-----------| ------------- |
