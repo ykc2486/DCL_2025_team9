@@ -1,10 +1,12 @@
 module tetris_core (
     input wire clk, rst,
     input wire [3:0] btn, // {3:Rot, 2:Left, 1:Right, 0:Down}
+    input wire sw_hold,   // 來自 sw[0]
     input wire [9:0] grid_x, grid_y, 
     output reg [2:0] pixel_block_id, 
     output reg [7:0] score,
-    output wire [2:0] next_piece_id
+    output wire [2:0] next_piece_id,
+    output wire [2:0] hold_piece_id
 );
 
     parameter COLS = 10;
@@ -18,6 +20,11 @@ module tetris_core (
     // Next Piece
     reg [2:0] next_piece_reg;
     assign next_piece_id = next_piece_reg;
+
+    // Hold Piece
+    reg [2:0] hold_piece;
+    reg hold_used; 
+    assign hold_piece_id = hold_piece;
     
     localparam TIME_DROP_FAST = 5000000; 
     localparam TIME_DROP_SLOW = 25000000; 
@@ -25,13 +32,22 @@ module tetris_core (
     reg [25:0] timer;
     reg [2:0] state; // 0:Spawn, 1:Active, 2:Lock, 3:Clear
     
+    // Button Edge Detection
     reg [3:0] btn_prev;
     wire [3:0] btn_press = btn & ~btn_prev;
-    always @(posedge clk) btn_prev <= btn;
+    
+    // Switch Edge Detection
+    reg sw_prev;
+    wire sw_change = (sw_hold != sw_prev); 
+
+    always @(posedge clk) begin
+        btn_prev <= btn;
+        sw_prev <= sw_hold;
+    end
 
     wire [25:0] drop_limit = (~btn[0]) ? TIME_DROP_FAST : TIME_DROP_SLOW;
 
-    // --- Geometry ---
+    // --- Geometry (函數保持不變) ---
     function [7:0] get_offset;
         input [2:0] shape; 
         input [1:0] rot; 
@@ -79,7 +95,7 @@ module tetris_core (
         end
     endfunction
 
-    // --- Collision ---
+    // --- Collision Task (保持不變) ---
     reg col_res;
     integer m;
     reg signed [3:0] tox, toy;
@@ -108,45 +124,76 @@ module tetris_core (
     
     reg [7:0] rand_reg;
     wire [2:0] random_val = (rand_reg[2:0] == 0) ? 1 : rand_reg[2:0];
-    
+    reg [2:0] tmp_piece;
+
     always @(posedge clk) begin
         if (rst) begin
             state <= 0;
             score <= 0;
             timer <= 0;
             rand_reg <= 8'hA5;
+            
+            // [恢復] Reset 時 Hold 為空
+            hold_piece <= 0; 
+            hold_used <= 0;
+
             next_piece_reg <= 1; 
             cur_x <= 0; cur_y <= 0; cur_piece <= 1; cur_rot <= 0;
             for(i=0; i<ROWS; i=i+1) for(j=0; j<COLS; j=j+1) board[i][j] <= 0;
         end else begin
             rand_reg <= {rand_reg[6:0], rand_reg[7] ^ rand_reg[5]};
+            
             if (state == 1 && timer < drop_limit) timer <= timer + 1;
 
             case(state)
-                0: begin 
+                0: begin // SPAWN
                     cur_piece <= next_piece_reg;
                     next_piece_reg <= random_val;
                     cur_x <= 4; cur_y <= 1; cur_rot <= 0;
+                    hold_used <= 0; // 重置 Hold 次數
+                    
                     check_collision(4, 1, 0); 
                     if (col_res) begin 
                         for(i=0; i<ROWS; i=i+1) for(j=0; j<COLS; j=j+1) board[i][j] <= 0;
                         score <= 0;
+                        hold_piece <= 0; // Game Over 時也清空 Hold
                     end
                     state <= 1; timer <= 0;
                 end
-                1: begin 
-                    // [修正] 按鈕邏輯: Btn 3=Rotate, Btn 2=Left, Btn 1=Right
+
+                1: begin // ACTIVE
+                    if (sw_change && !hold_used) begin
+                        hold_used <= 1; 
+                        timer <= 0; 
+                        
+                        // [修改] 交換後重置位置與旋轉
+                        cur_x <= 4; 
+                        cur_y <= 1; 
+                        cur_rot <= 0; 
+
+                        if (hold_piece == 0) begin
+                            // 第一次 Hold：存入當前，生成新的
+                            hold_piece <= cur_piece;
+                            cur_piece <= next_piece_reg;
+                            next_piece_reg <= random_val;
+                        end else begin
+                            // 有 Hold：交換
+                            tmp_piece = cur_piece;
+                            cur_piece <= hold_piece;
+                            hold_piece <= tmp_piece;
+                        end
+                    end
+
+                    // 按鈕處理 (保持不變)
                     if (btn_press[3]) begin
                         check_collision(cur_x, cur_y, cur_rot + 1);
                         if (!col_res) cur_rot <= cur_rot + 1;
                     end
-                    // 根據你的要求：btn 2 往左移 (Left)
-                    if (btn_press[2]) begin 
+                    if (btn_press[2]) begin // Left
                         check_collision(cur_x - 1, cur_y, cur_rot);
                         if (!col_res) cur_x <= cur_x - 1;
                     end
-                    // 根據你的要求：btn 1 往右移 (Right)
-                    if (btn_press[1]) begin 
+                    if (btn_press[1]) begin // Right
                         check_collision(cur_x + 1, cur_y, cur_rot);
                         if (!col_res) cur_x <= cur_x + 1;
                     end
@@ -158,7 +205,8 @@ module tetris_core (
                         else state <= 2; 
                     end
                 end
-                2: begin 
+
+                2: begin // LOCK
                     for (k=0; k<4; k=k+1) begin
                         {ox, oy} = get_offset(cur_piece, cur_rot, k[1:0]);
                         if ((cur_y + oy) >= 0 && (cur_y + oy) < ROWS && 
@@ -168,7 +216,8 @@ module tetris_core (
                     end
                     state <= 3;
                 end
-                3: begin 
+
+                3: begin // CLEAR
                     cleared_count = 0;
                     for (i=0; i<ROWS; i=i+1) begin
                         full_row = 1;
@@ -196,7 +245,7 @@ module tetris_core (
         end
     end
 
-    // --- Rendering ---
+    // Rendering
     reg is_active_blk;
     integer n;
     reg signed [3:0] nox, noy;
@@ -204,7 +253,6 @@ module tetris_core (
     always @(*) begin
         pixel_block_id = 0;
         is_active_blk = 0;
-        
         if (state == 1 || state == 2) begin
             for (n=0; n<4; n=n+1) begin
                 {nox, noy} = get_offset(cur_piece, cur_rot, n[1:0]);
@@ -215,7 +263,6 @@ module tetris_core (
                 end
             end
         end
-        
         if (is_active_blk) pixel_block_id = cur_piece;
         else if (grid_x < COLS && grid_y < ROWS) pixel_block_id = board[grid_y][grid_x];
         else pixel_block_id = 0;
