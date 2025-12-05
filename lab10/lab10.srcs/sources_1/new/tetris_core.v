@@ -1,9 +1,10 @@
 module tetris_core (
     input wire clk, rst,
-    input wire [3:0] btn, 
-    input wire [9:0] grid_x, grid_y, // 來自 Top 的安全座標
+    input wire [3:0] btn, // {3:Rot, 2:Left, 1:Right, 0:Down}
+    input wire [9:0] grid_x, grid_y, 
     output reg [2:0] pixel_block_id, 
-    output reg [7:0] score
+    output reg [7:0] score,
+    output wire [2:0] next_piece_id
 );
 
     parameter COLS = 10;
@@ -11,8 +12,12 @@ module tetris_core (
 
     reg [2:0] board [19:0][9:0]; 
     reg [2:0] cur_piece; 
-    reg [1:0] cur_rot;   
+    reg [1:0] cur_rot;    
     integer cur_x, cur_y;
+    
+    // Next Piece
+    reg [2:0] next_piece_reg;
+    assign next_piece_id = next_piece_reg;
     
     localparam TIME_DROP_FAST = 5000000; 
     localparam TIME_DROP_SLOW = 25000000; 
@@ -26,237 +31,92 @@ module tetris_core (
 
     wire [25:0] drop_limit = (~btn[0]) ? TIME_DROP_FAST : TIME_DROP_SLOW;
 
-    // --- 1. Geometry (保持不變) ---
+    // --- Geometry ---
     function [7:0] get_offset;
-        input [2:0] p; input [1:0] r; input [1:0] idx;
+        input [2:0] shape; 
+        input [1:0] rot; 
+        input [1:0] idx; 
         reg signed [3:0] dx, dy;
         begin
-            // Inputs: p, idx, r[0] (assuming r is an array or vector, and we are only checking the first element)
-            // Inputs: p, idx, r[0]
-            // Outputs: dx, dy (which are combined into get_offset)
-            
-            dx = 0;
-            dy = 0;
-            
-            case (p) // Main case based on input 'p'
-                // --- Case 1 ---
-                1: begin
-                    if (!r[0]) begin // r[0] is false (0)
-                        case (idx)
-                            0: begin dx = -1; end // Added begin/end
-                            1: begin dx = 0; end
-                            2: begin dx = 1; end
-                            3: begin dx = 2; end
-                        endcase
-                    end else begin // r[0] is true (1)
-                        case (idx)
-                            0: begin dy = -1; end
-                            1: begin dy = 0; end
-                            2: begin dy = 1; end
-                            3: begin dy = 2; end
-                        endcase
-                    end
-                end
-            
-                // --- Case 2 ---
-                2: begin
-                    case (r)
-                        0: begin
-                            case (idx)
-                                0: begin dx = -1; dy = -1; end // Multiple statements always need begin/end
-                                1: begin dx = -1; dy = 0; end
-                                2: begin dx = 0; dy = 0; end
-                                3: begin dx = 1; dy = 0; end
-                            endcase
-                        end
-                        1: begin
-                            case (idx)
-                                0: begin dx = 1; dy = -1; end // Compound single statement, wrapped for safety
-                                1: begin dy = -1; end
-                                2: begin dy = 0; end
-                                3: begin dy = 1; end
-                            endcase
-                        end
-                        2: begin
-                            case (idx)
-                                0: begin dx = 1; dy = 1; end
-                                1: begin dx = 1; end
-                                2: begin dx = 0; end
-                                3: begin dx = -1; end
-                            endcase
-                        end
-                        3: begin
-                            case (idx)
-                                0: begin dx = -1; dy = 1; end
-                                1: begin dy = 1; end
-                                2: begin dy = 0; end
-                                3: begin dy = -1; end
-                            endcase
-                        end
-                    endcase
-                end
-            
-                // --- Case 3 ---
-                3: begin
-                    case (r)
-                        0: begin
-                            case (idx)
-                                0: begin dx = 1; dy = -1; end
-                                1: begin dx = -1; end
-                                2: begin dx = 0; end
-                                3: begin dx = 1; end
-                            endcase
-                        end
-                        1: begin
-                            case (idx)
-                                0: begin dx = 1; dy = 1; end
-                                1: begin dy = -1; end
-                                2: begin dy = 0; end
-                                3: begin dy = 1; end
-                            endcase
-                        end
-                        2: begin
-                            case (idx)
-                                0: begin dx = -1; dy = 1; end
-                                1: begin dx = 1; end
-                                2: begin dx = 0; end
-                                3: begin dx = -1; end
-                            endcase
-                        end
-                        3: begin
-                            case (idx)
-                                0: begin dx = -1; dy = -1; end
-                                1: begin dy = 1; end
-                                2: begin dy = 0; end
-                                3: begin dy = -1; end
-                            endcase
-                        end
-                    endcase
-                end
-            
-                // --- Case 4 ---
-                4: begin
-                    case (idx)
-                        1: begin dx = 1; end
-                        2: begin dy = 1; end
-                        3: begin dx = 1; dy = 1; end
-                    endcase
-                end
-            
-                // --- Case 5 ---
-                5: begin
-                    if (!r[0]) begin
-                        case (idx)
-                            0: begin dx = -1; dy = 1; end
-                            1: begin dy = 1; end
-                            2: begin dx = 0; end
-                            3: begin dx = 1; end
-                        endcase
-                    end else begin
-                        case (idx)
-                            0: begin dx = -1; dy = -1; end
-                            1: begin dx = -1; end
-                            2: begin dx = 0; end
-                            3: begin dy = 1; end
-                        endcase
-                    end
-                end
-            
-                // --- Case 6 ---
-                6: begin
-                    case (r)
-                        0: begin
-                            case (idx)
-                                0: begin dy = -1; end
-                                1: begin dx = -1; end
-                                2: begin dx = 0; end
-                                3: begin dx = 1; end
-                            endcase
-                        end
-                        1: begin
-                            case (idx)
-                                0: begin dx = 1; end
-                                1: begin dy = -1; end
-                                2: begin dy = 0; end
-                                3: begin dy = 1; end
-                            endcase
-                        end
-                        2: begin
-                            case (idx)
-                                0: begin dy = 1; end
-                                1: begin dx = 1; end
-                                2: begin dx = 0; end
-                                3: begin dx = -1; end
-                            endcase
-                        end
-                        3: begin
-                            case (idx)
-                                0: begin dx = -1; end
-                                1: begin dy = 1; end
-                                2: begin dy = 0; end
-                                3: begin dy = -1; end
-                            endcase
-                        end
-                    endcase
-                end
-            
-                // --- Case 7 ---
-                7: begin
-                    if (!r[0]) begin
-                        case (idx)
-                            0: begin dx = -1; end
-                            1: begin dx = 0; end
-                            2: begin dy = 1; end
-                            3: begin dx = 1; dy = 1; end
-                        endcase
-                    end else begin
-                        case (idx)
-                            0: begin dx = 1; dy = -1; end
-                            1: begin dx = 1; end
-                            2: begin dx = 0; end
-                            3: begin dy = 1; end
-                        endcase
-                    end
-                end
-            
-                // --- Default Case ---
-                default: begin
-                    {dx, dy} = {4'd0, 4'd0};
-                end
+            dx = 4'sd0; dy = 4'sd0;
+            case (shape)
+                1: case (rot[0]) // I
+                    0: case(idx) 0: begin dx=-4'sd1; dy=4'sd0; end 1: begin dx=4'sd0; dy=4'sd0; end 2: begin dx=4'sd1; dy=4'sd0; end 3: begin dx=4'sd2; dy=4'sd0; end endcase
+                    1: case(idx) 0: begin dx=4'sd0; dy=-4'sd1; end 1: begin dx=4'sd0; dy=4'sd0; end 2: begin dx=4'sd0; dy=4'sd1; end 3: begin dx=4'sd0; dy=4'sd2; end endcase
+                   endcase
+                2: case (rot) // J
+                    0: case(idx) 0:{dx,dy}={-4'sd1,-4'sd1}; 1:{dx,dy}={-4'sd1, 4'sd0}; 2:{dx,dy}={ 4'sd0, 4'sd0}; 3:{dx,dy}={ 4'sd1, 4'sd0}; endcase
+                    1: case(idx) 0:{dx,dy}={ 4'sd0,-4'sd1}; 1:{dx,dy}={ 4'sd1,-4'sd1}; 2:{dx,dy}={ 4'sd0, 4'sd0}; 3:{dx,dy}={ 4'sd0, 4'sd1}; endcase
+                    2: case(idx) 0:{dx,dy}={-4'sd1, 4'sd0}; 1:{dx,dy}={ 4'sd0, 4'sd0}; 2:{dx,dy}={ 4'sd1, 4'sd0}; 3:{dx,dy}={ 4'sd1, 4'sd1}; endcase
+                    3: case(idx) 0:{dx,dy}={ 4'sd0,-4'sd1}; 1:{dx,dy}={ 4'sd0, 4'sd0}; 2:{dx,dy}={-4'sd1, 4'sd1}; 3:{dx,dy}={ 4'sd0, 4'sd1}; endcase
+                   endcase
+                3: case (rot) // L
+                    0: case(idx) 0:{dx,dy}={ 4'sd1,-4'sd1}; 1:{dx,dy}={-4'sd1, 4'sd0}; 2:{dx,dy}={ 4'sd0, 4'sd0}; 3:{dx,dy}={ 4'sd1, 4'sd0}; endcase
+                    1: case(idx) 0:{dx,dy}={ 4'sd0,-4'sd1}; 1:{dx,dy}={ 4'sd0, 4'sd0}; 2:{dx,dy}={ 4'sd0, 4'sd1}; 3:{dx,dy}={ 4'sd1, 4'sd1}; endcase
+                    2: case(idx) 0:{dx,dy}={-4'sd1, 4'sd0}; 1:{dx,dy}={ 4'sd0, 4'sd0}; 2:{dx,dy}={ 4'sd1, 4'sd0}; 3:{dx,dy}={-4'sd1, 4'sd1}; endcase
+                    3: case(idx) 0:{dx,dy}={-4'sd1,-4'sd1}; 1:{dx,dy}={ 4'sd0,-4'sd1}; 2:{dx,dy}={ 4'sd0, 4'sd0}; 3:{dx,dy}={ 4'sd0, 4'sd1}; endcase
+                   endcase
+                4: case(idx) // O
+                    0:{dx,dy}={ 4'sd0, 4'sd0}; 1:{dx,dy}={ 4'sd1, 4'sd0}; 2:{dx,dy}={ 4'sd0, 4'sd1}; 3:{dx,dy}={ 4'sd1, 4'sd1}; 
+                   endcase
+                5: case (rot[0]) // S
+                    0: case(idx) 0:{dx,dy}={ 4'sd0, 4'sd0}; 1:{dx,dy}={ 4'sd1, 4'sd0}; 2:{dx,dy}={-4'sd1, 4'sd1}; 3:{dx,dy}={ 4'sd0, 4'sd1}; endcase
+                    1: case(idx) 0:{dx,dy}={ 4'sd0,-4'sd1}; 1:{dx,dy}={ 4'sd0, 4'sd0}; 2:{dx,dy}={ 4'sd1, 4'sd0}; 3:{dx,dy}={ 4'sd1, 4'sd1}; endcase
+                   endcase
+                6: case (rot) // T
+                    0: case(idx) 0:{dx,dy}={ 4'sd0,-4'sd1}; 1:{dx,dy}={-4'sd1, 4'sd0}; 2:{dx,dy}={ 4'sd0, 4'sd0}; 3:{dx,dy}={ 4'sd1, 4'sd0}; endcase
+                    1: case(idx) 0:{dx,dy}={ 4'sd0,-4'sd1}; 1:{dx,dy}={ 4'sd0, 4'sd0}; 2:{dx,dy}={ 4'sd1, 4'sd0}; 3:{dx,dy}={ 4'sd0, 4'sd1}; endcase
+                    2: case(idx) 0:{dx,dy}={-4'sd1, 4'sd0}; 1:{dx,dy}={ 4'sd0, 4'sd0}; 2:{dx,dy}={ 4'sd1, 4'sd0}; 3:{dx,dy}={ 4'sd0, 4'sd1}; endcase
+                    3: case(idx) 0:{dx,dy}={ 4'sd0,-4'sd1}; 1:{dx,dy}={-4'sd1, 4'sd0}; 2:{dx,dy}={ 4'sd0, 4'sd0}; 3:{dx,dy}={ 4'sd0, 4'sd1}; endcase
+                   endcase
+                7: case (rot[0]) // Z
+                    0: case(idx) 0:{dx,dy}={-4'sd1, 4'sd0}; 1:{dx,dy}={ 4'sd0, 4'sd0}; 2:{dx,dy}={ 4'sd0, 4'sd1}; 3:{dx,dy}={ 4'sd1, 4'sd1}; endcase
+                    1: case(idx) 0:{dx,dy}={ 4'sd1,-4'sd1}; 1:{dx,dy}={ 4'sd0, 4'sd0}; 2:{dx,dy}={ 4'sd1, 4'sd0}; 3:{dx,dy}={ 4'sd0, 4'sd1}; endcase
+                   endcase
+                default: {dx, dy} = {4'sd0, 4'sd0};
             endcase
-            
             get_offset = {dx, dy};
-
         end
     endfunction
 
-    // --- 2. Collision (保持不變) ---
+    // --- Collision ---
     reg col_res;
     integer m;
     reg signed [3:0] tox, toy;
     task check_collision;
-        input integer tx, ty; input [1:0] tr;
+        input integer tx, ty; 
+        input [1:0] tr;
         begin
             col_res = 0;
             for(m=0; m<4; m=m+1) begin
                 {tox, toy} = get_offset(cur_piece, tr, m[1:0]);
-                if (tx + tox < 0 || tx + tox >= COLS || ty + toy >= ROWS) col_res = 1;
-                else if (ty + toy >= 0 && board[ty+toy][tx+tox] > 0) col_res = 1;
+                if (tx + tox < 0 || tx + tox >= COLS || ty + toy >= ROWS) begin
+                    col_res = 1;
+                end
+                else if (ty + toy >= 0) begin
+                    if (board[ty + toy][tx + tox] != 0) col_res = 1;
+                end
             end
         end
     endtask
 
-    // --- 3. FSM (保持不變) ---
+    // --- FSM ---
     integer i, j, k, cleared_count;
-    integer dst_row; // Destination row index (blocking assignment)
+    integer dst_row; 
     reg signed [3:0] ox, oy;
     reg full_row;
+    
     reg [7:0] rand_reg;
-    wire [2:0] next_piece = (rand_reg[2:0] == 0) ? 1 : rand_reg[2:0];
+    wire [2:0] random_val = (rand_reg[2:0] == 0) ? 1 : rand_reg[2:0];
     
     always @(posedge clk) begin
         if (rst) begin
-            state <= 0; score <= 0; timer <= 0; rand_reg <= 8'hA5;
+            state <= 0;
+            score <= 0;
+            timer <= 0;
+            rand_reg <= 8'hA5;
+            next_piece_reg <= 1; 
+            cur_x <= 0; cur_y <= 0; cur_piece <= 1; cur_rot <= 0;
             for(i=0; i<ROWS; i=i+1) for(j=0; j<COLS; j=j+1) board[i][j] <= 0;
         end else begin
             rand_reg <= {rand_reg[6:0], rand_reg[7] ^ rand_reg[5]};
@@ -264,30 +124,36 @@ module tetris_core (
 
             case(state)
                 0: begin 
-                    cur_piece <= next_piece; cur_x <= 4; cur_y <= 1; cur_rot <= 0;
+                    cur_piece <= next_piece_reg;
+                    next_piece_reg <= random_val;
+                    cur_x <= 4; cur_y <= 1; cur_rot <= 0;
                     check_collision(4, 1, 0); 
-                    if (col_res) begin
-                        for(i = 0; i < ROWS; i=i+1) for(j = 0; j < COLS; j=j+1) board[i][j] <= 0;
+                    if (col_res) begin 
+                        for(i=0; i<ROWS; i=i+1) for(j=0; j<COLS; j=j+1) board[i][j] <= 0;
                         score <= 0;
-                    end 
+                    end
                     state <= 1; timer <= 0;
                 end
                 1: begin 
+                    // [修正] 按鈕邏輯: Btn 3=Rotate, Btn 2=Left, Btn 1=Right
                     if (btn_press[3]) begin
-                        check_collision(cur_x, cur_y, cur_rot+1);
+                        check_collision(cur_x, cur_y, cur_rot + 1);
                         if (!col_res) cur_rot <= cur_rot + 1;
                     end
-                    if (btn_press[1]) begin
-                        check_collision(cur_x+1, cur_y, cur_rot);
-                        if (!col_res) cur_x <= cur_x + 1;
-                    end
-                    if (btn_press[2]) begin
-                        check_collision(cur_x-1, cur_y, cur_rot);
+                    // 根據你的要求：btn 2 往左移 (Left)
+                    if (btn_press[2]) begin 
+                        check_collision(cur_x - 1, cur_y, cur_rot);
                         if (!col_res) cur_x <= cur_x - 1;
                     end
+                    // 根據你的要求：btn 1 往右移 (Right)
+                    if (btn_press[1]) begin 
+                        check_collision(cur_x + 1, cur_y, cur_rot);
+                        if (!col_res) cur_x <= cur_x + 1;
+                    end
+                    
                     if (timer >= drop_limit) begin 
                         timer <= 0;
-                        check_collision(cur_x, cur_y+1, cur_rot);
+                        check_collision(cur_x, cur_y + 1, cur_rot);
                         if (!col_res) cur_y <= cur_y + 1;
                         else state <= 2; 
                     end
@@ -295,68 +161,42 @@ module tetris_core (
                 2: begin 
                     for (k=0; k<4; k=k+1) begin
                         {ox, oy} = get_offset(cur_piece, cur_rot, k[1:0]);
-                        if ((cur_y+oy) >= 0 && (cur_y+oy) < ROWS && 
-                            (cur_x+ox) >= 0 && (cur_x+ox) < COLS) begin
-                            board[cur_y+oy][cur_x+ox] <= cur_piece;
+                        if ((cur_y + oy) >= 0 && (cur_y + oy) < ROWS && 
+                            (cur_x + ox) >= 0 && (cur_x + ox) < COLS) begin
+                            board[cur_y + oy][cur_x + ox] <= cur_piece;
                         end
                     end
                     state <= 3;
                 end
                 3: begin 
-                    // Note: 'cleared_count' and 'dst_row' must be declared as 'integer'                    
                     cleared_count = 0;
-                    
-                    // Pass 1: Identify and Count Cleared Lines
                     for (i=0; i<ROWS; i=i+1) begin
                         full_row = 1;
-                        for (j=0; j<COLS; j=j+1) begin
-                            if (board[i][j] == 0) full_row = 0;
-                        end
+                        for (j=0; j<COLS; j=j+1) if (board[i][j] == 0) full_row = 0;
                         if (full_row) cleared_count = cleared_count + 1;
                     end
-                    
-                    // Update score and perform compaction only if lines were cleared
                     if (cleared_count > 0) begin
-                        score <= score + cleared_count; 
-                        
-                        // Pass 2: Compact the Board (Shift)
+                        score <= score + cleared_count;
                         dst_row = ROWS - 1; 
-                        
-                        // Iterate from the bottom up. 'i' is the Source row index
                         for (i=ROWS-1; i>=0; i=i-1) begin
-                            // Re-check full_row for the original row i content
                             full_row = 1;
-                            for (j=0; j<COLS; j=j+1) begin
-                                if (board[i][j] == 0) full_row = 0;
-                            end
-                            
+                            for (j=0; j<COLS; j=j+1) if (board[i][j] == 0) full_row = 0;
                             if (!full_row) begin
-                                // If the source row 'i' is NOT full, copy it to the destination 'dst_row'
-                                for (j=0; j<COLS; j=j+1) begin
-                                    board[dst_row][j] <= board[i][j]; 
-                                end
-                                dst_row = dst_row - 1; // Move the destination up
+                                for (j=0; j<COLS; j=j+1) board[dst_row][j] <= board[i][j]; 
+                                dst_row = dst_row - 1; 
                             end
                         end
-                        
-                        // Pass 3: Clear all remaining top rows (index 0 up to dst_row)
-                        // This loop is SYNTHESIS-SAFE: constant bound ROWS and conditional assignment.
                         for (i=0; i<ROWS; i=i+1) begin
-                            if (i <= dst_row) begin
-                                for (j=0; j<COLS; j=j+1) begin
-                                    board[i][j] <= 0; 
-                                end
-                            end
+                            if (i <= dst_row) for (j=0; j<COLS; j=j+1) board[i][j] <= 0; 
                         end
                     end 
-
-                    state <= 0; // Return to Spawn state
+                    state <= 0; 
                 end
             endcase
         end
     end
 
-    // --- 4. Rendering (Safe Comparison) ---
+    // --- Rendering ---
     reg is_active_blk;
     integer n;
     reg signed [3:0] nox, noy;
@@ -368,20 +208,16 @@ module tetris_core (
         if (state == 1 || state == 2) begin
             for (n=0; n<4; n=n+1) begin
                 {nox, noy} = get_offset(cur_piece, cur_rot, n[1:0]);
-                // [關鍵修正] 使用 $signed() 確保比較時是使用有號數邏輯
-                // 這樣當 cur_x + nox 為負數時，不會被誤判為巨大的正數
                 if ($signed({1'b0, grid_x}) == cur_x + nox && 
                     $signed({1'b0, grid_y}) == cur_y + noy) 
+                begin
                     is_active_blk = 1;
+                end
             end
         end
         
-        if (is_active_blk) begin
-            pixel_block_id = cur_piece;
-        end else begin
-            // 因為 Top 層已經保證 grid_x/y 在 0-9/0-19 範圍內，這裡直接讀取
-            pixel_block_id = board[grid_y][grid_x]; 
-        end
+        if (is_active_blk) pixel_block_id = cur_piece;
+        else if (grid_x < COLS && grid_y < ROWS) pixel_block_id = board[grid_y][grid_x];
+        else pixel_block_id = 0;
     end
-
 endmodule

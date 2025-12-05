@@ -5,3 +5,5 @@
 *.jou
 *.str
 .dmp
+*.cache/ 
+*.runs/
