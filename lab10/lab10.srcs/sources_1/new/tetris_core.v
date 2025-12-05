@@ -247,7 +247,8 @@ module tetris_core (
     endtask
 
     // --- 3. FSM (保持不變) ---
-    integer i, j, k;
+    integer i, j, k, cleared_count;
+    integer dst_row; // Destination row index (blocking assignment)
     reg signed [3:0] ox, oy;
     reg full_row;
     reg [7:0] rand_reg;
@@ -302,16 +303,54 @@ module tetris_core (
                     state <= 3;
                 end
                 3: begin 
+                    // Note: 'cleared_count' and 'dst_row' must be declared as 'integer'                    
+                    cleared_count = 0;
+                    
+                    // Pass 1: Identify and Count Cleared Lines
                     for (i=0; i<ROWS; i=i+1) begin
                         full_row = 1;
-                        for (j=0; j<COLS; j=j+1) if (board[i][j] == 0) full_row = 0;
-                        if (full_row) begin
-                            score <= score + 1;
-                            for (k=i; k>0; k=k-1) for (j=0; j<COLS; j=j+1) board[k][j] <= board[k-1][j];
-                            for (j=0; j<COLS; j=j+1) board[0][j] <= 0;
+                        for (j=0; j<COLS; j=j+1) begin
+                            if (board[i][j] == 0) full_row = 0;
                         end
+                        if (full_row) cleared_count = cleared_count + 1;
                     end
-                    state <= 0; 
+                    
+                    // Update score and perform compaction only if lines were cleared
+                    if (cleared_count > 0) begin
+                        score <= score + cleared_count; 
+                        
+                        // Pass 2: Compact the Board (Shift)
+                        dst_row = ROWS - 1; 
+                        
+                        // Iterate from the bottom up. 'i' is the Source row index
+                        for (i=ROWS-1; i>=0; i=i-1) begin
+                            // Re-check full_row for the original row i content
+                            full_row = 1;
+                            for (j=0; j<COLS; j=j+1) begin
+                                if (board[i][j] == 0) full_row = 0;
+                            end
+                            
+                            if (!full_row) begin
+                                // If the source row 'i' is NOT full, copy it to the destination 'dst_row'
+                                for (j=0; j<COLS; j=j+1) begin
+                                    board[dst_row][j] <= board[i][j]; 
+                                end
+                                dst_row = dst_row - 1; // Move the destination up
+                            end
+                        end
+                        
+                        // Pass 3: Clear all remaining top rows (index 0 up to dst_row)
+                        // This loop is SYNTHESIS-SAFE: constant bound ROWS and conditional assignment.
+                        for (i=0; i<ROWS; i=i+1) begin
+                            if (i <= dst_row) begin
+                                for (j=0; j<COLS; j=j+1) begin
+                                    board[i][j] <= 0; 
+                                end
+                            end
+                        end
+                    end 
+
+                    state <= 0; // Return to Spawn state
                 end
             endcase
         end

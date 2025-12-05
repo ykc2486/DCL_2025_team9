@@ -1,0 +1,25 @@
+#-----------------------------------------------------------
+# Vivado v2025.1 (64-bit)
+# SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
+# IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
+# SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
+# Start of session at: Fri Dec  5 10:10:26 2025
+# Process ID         : 16260
+# Current directory  : C:/Users/Shlab_17/DCL_2025_team9/lab10
+# Command line       : vivado.exe -gui_launcher_event rodinguilauncherevent17460 C:\Users\Shlab_17\DCL_2025_team9\lab10\lab10.xpr
+# Log file           : C:/Users/Shlab_17/DCL_2025_team9/lab10/vivado.log
+# Journal file       : C:/Users/Shlab_17/DCL_2025_team9/lab10\vivado.jou
+# Running On         : Shlab17
+# Platform           : Windows Server 2016 or Windows 10
+# Operating System   : 26100
+# Processor Detail   : AMD Ryzen 7 5700                               
+# CPU Frequency      : 3693 MHz
+# CPU Physical cores : 8
+# CPU Logical cores  : 16
+# Host memory        : 17041 MB
+# Swap memory        : 1073 MB
+# Total Virtual      : 18115 MB
+# Available Virtual  : 11827 MB
+#-----------------------------------------------------------
+start_gui
+open_project C:/Users/Shlab_17/DCL_2025_team9/lab10/lab10.xpr

@@ -3,8 +3,8 @@
 # SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
 # IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
 # SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
-# Start of session at: Tue Dec  2 21:55:23 2025
-# Process ID         : 6964
+# Start of session at: Fri Dec  5 10:25:43 2025
+# Process ID         : 16048
 # Current directory  : C:/Users/Shlab_17/DCL_2025_team9/lab10/lab10.runs/synth_1
 # Command line       : vivado.exe -log tetris_top.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source tetris_top.tcl
 # Log file           : C:/Users/Shlab_17/DCL_2025_team9/lab10/lab10.runs/synth_1/tetris_top.vds
@@ -19,6 +19,6 @@
 # Host memory        : 17041 MB
 # Swap memory        : 1073 MB
 # Total Virtual      : 18115 MB
-# Available Virtual  : 8595 MB
+# Available Virtual  : 9972 MB
 #-----------------------------------------------------------
 source tetris_top.tcl -notrace

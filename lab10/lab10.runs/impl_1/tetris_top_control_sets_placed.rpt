@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
-| Date         : Tue Dec  2 21:57:26 2025
+| Date         : Fri Dec  5 10:28:42 2025
 | Host         : Shlab17 running 64-bit major release  (build 9200)
 | Command      : report_control_sets -verbose -file tetris_top_control_sets_placed.rpt
 | Design       : tetris_top
@@ -27,7 +27,7 @@ Table of Contents
 |    Minimum number of control sets                        |    16 |
 |    Addition due to synthesis replication                 |     0 |
 |    Addition due to physical synthesis replication        |     0 |
-| Unused register locations in slices containing registers |    58 |
+| Unused register locations in slices containing registers |    56 |
 +----------------------------------------------------------+-------+
 * Control sets can be merged at opt_design using control_set_merge or merge_equivalent_drivers
 ** Run report_qor_suggestions for automated merging and remapping suggestions
@@ -41,13 +41,13 @@ Table of Contents
 +--------------------+-------+
 | Total control sets |    16 |
 | >= 0 to < 4        |     1 |
-| >= 4 to < 6        |     1 |
+| >= 4 to < 6        |     0 |
 | >= 6 to < 8        |     0 |
 | >= 8 to < 10       |     2 |
 | >= 10 to < 12      |     2 |
-| >= 12 to < 14      |     1 |
+| >= 12 to < 14      |     3 |
 | >= 14 to < 16      |     0 |
-| >= 16              |     9 |
+| >= 16              |     8 |
 +--------------------+-------+
 * Control sets can be remapped at either synth_design or opt_design
 
@@ -58,12 +58,12 @@ Table of Contents
 +--------------+-----------------------+------------------------+-----------------+--------------+
 | Clock Enable | Synchronous Set/Reset | Asynchronous Set/Reset | Total Registers | Total Slices |
 +--------------+-----------------------+------------------------+-----------------+--------------+
-| No           | No                    | No                     |              21 |           14 |
-| No           | No                    | Yes                    |               8 |            6 |
-| No           | Yes                   | No                     |             673 |          344 |
-| Yes          | No                    | No                     |               0 |            0 |
-| Yes          | No                    | Yes                    |              84 |           18 |
-| Yes          | Yes                   | No                     |             132 |           39 |
+| No           | No                    | No                     |              13 |            9 |
+| No           | No                    | Yes                    |               8 |            5 |
+| No           | Yes                   | No                     |             673 |          364 |
+| Yes          | No                    | No                     |              32 |           11 |
+| Yes          | No                    | Yes                    |              84 |           17 |
+| Yes          | Yes                   | No                     |             110 |           40 |
 +--------------+-----------------------+------------------------+-----------------+--------------+
 
 
@@ -74,21 +74,21 @@ Table of Contents
 |  Clock Signal  |           Enable Signal          |      Set/Reset Signal      | Slice Load Count | Bel Load Count | Bels / Slice |
 +----------------+----------------------------------+----------------------------+------------------+----------------+--------------+
 |  clk_IBUF_BUFG |                                  |                            |                1 |              1 |         1.00 |
-|  vga_clk_BUFG  | core/FSM_onehot_state[3]_i_2_n_0 | core/reset_n               |                1 |              4 |         4.00 |
-|  clk_IBUF_BUFG |                                  | cd0/counter[7]_i_1__3_n_0  |                2 |              8 |         4.00 |
-|  vga_clk_BUFG  | core/score[7]_i_1_n_0            | core/reset_n               |                3 |              8 |         2.67 |
-|  vga_clk_BUFG  | vs0/p_tick                       | vs0/h_count_reg[9]_i_1_n_0 |                3 |             10 |         3.33 |
-|  vga_clk_BUFG  | vs0/v_count_reg[9]_i_2_n_0       | vs0/v_count_reg[9]_i_1_n_0 |                5 |             10 |         2.00 |
+|  clk_IBUF_BUFG |                                  | cd0/counter[7]_i_1__3_n_0  |                3 |              8 |         2.67 |
+|  vga_clk_BUFG  | core/score[7]_i_1_n_0            | core/reset_n               |                2 |              8 |         4.00 |
+|  vga_clk_BUFG  | vs0/p_tick                       | vs0/h_count_reg[9]_i_1_n_0 |                6 |             10 |         1.67 |
+|  vga_clk_BUFG  | vs0/v_count_reg[9]_i_2_n_0       | vs0/v_count_reg[9]_i_1_n_0 |                4 |             10 |         2.50 |
+|  vga_clk_BUFG  |                                  |                            |                8 |             12 |         1.50 |
 |  vga_clk_BUFG  | vs0/p_tick                       | vs0/rgb_reg                |                3 |             12 |         4.00 |
-|  vga_clk_BUFG  |                                  |                            |               13 |             20 |         1.54 |
+|  vga_clk_BUFG  | core/FSM_onehot_state[3]_i_2_n_0 | core/reset_n               |                8 |             13 |         1.62 |
 |  vga_clk_BUFG  | db0/counter[20]_i_1__2_n_0       | core/reset_n               |                4 |             21 |         5.25 |
-|  vga_clk_BUFG  | db1/counter[20]_i_1__1_n_0       | core/reset_n               |                5 |             21 |         4.20 |
-|  vga_clk_BUFG  | db2/counter[20]_i_1__0_n_0       | core/reset_n               |                5 |             21 |         4.20 |
-|  vga_clk_BUFG  | db3/counter[20]_i_1_n_0          | core/reset_n               |                4 |             21 |         5.25 |
+|  vga_clk_BUFG  | db1/counter[20]_i_1__1_n_0       | core/reset_n               |                4 |             21 |         5.25 |
+|  vga_clk_BUFG  | db2/counter[20]_i_1__0_n_0       | core/reset_n               |                4 |             21 |         5.25 |
+|  vga_clk_BUFG  | db3/counter[20]_i_1_n_0          | core/reset_n               |                5 |             21 |         4.20 |
 |  vga_clk_BUFG  | core/timer[25]_i_1_n_0           | core/reset_n               |                9 |             26 |         2.89 |
-|  vga_clk_BUFG  | core/cur_x[31]_i_2_n_0           | core/cur_x[31]_i_1_n_0     |                7 |             31 |         4.43 |
 |  vga_clk_BUFG  | core/cur_y[31]_i_2_n_0           | core/cur_y[31]_i_1_n_0     |                8 |             31 |         3.88 |
-|  vga_clk_BUFG  |                                  | core/reset_n               |              348 |            673 |         1.93 |
+|  vga_clk_BUFG  | core/cur_x[31]_i_1_n_0           |                            |               11 |             32 |         2.91 |
+|  vga_clk_BUFG  |                                  | core/reset_n               |              366 |            673 |         1.84 |
 +----------------+----------------------------------+----------------------------+------------------+----------------+--------------+
 
 
