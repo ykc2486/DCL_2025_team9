@@ -2,13 +2,14 @@
 
 ## Problems
 - [ ] hold
-- [ ] multi-row elimination
+- [X] multi-row elimination
 - [ ] score
 - [ ] random blocks
 - [ ] rank
 - [ ] level-color
 - [ ] background
 - [ ] random obtacles
+- [X] next
 
 ## Expected-Feature
 1. dual-player
