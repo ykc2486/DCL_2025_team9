@@ -9,6 +9,10 @@ module tetris_top(
     output [3:0] VGA_GREEN,
     output [3:0] VGA_BLUE
 );
+    
+    // FSM variable
+    localparam S_MAIN_IDLE = 0, S_MAIN_GAME = 1;
+    reg P, P_next;
 
     // --- 參數定義 ---
     localparam BLK_SIZE = 20;
@@ -144,6 +148,23 @@ module tetris_top(
         end
     endfunction
 
+    // FSM logic --------------------------------------------------------------
+    always @ (posedge clk) begin
+        if(~reset_n) P <= S_MAIN_IDLE;
+        else P <= P_next;
+    end
+    
+    always @ (*) begin
+        if(~reset_n) P_next = S_MAIN_IDLE;
+        else begin
+            case(P)
+                S_MAIN_IDLE: P_next = usr_btn[0] ? S_MAIN_GAME : S_MAIN_IDLE;
+                S_MAIN_GAME: P_next = S_MAIN_GAME;
+                default: P_next = S_MAIN_IDLE;
+            endcase
+        end
+    end
+    //----------------------------------------------------------------------
     wire [15:0] next_bitmap = get_preview_bitmap(core_next_id);
     wire is_next_pixel_on = next_bitmap[15 - {next_grid_y[1:0], next_grid_x[1:0]}];
 
@@ -182,7 +203,8 @@ module tetris_top(
             is_next_blk_d1 <= 0; is_next_blk_d2 <= 0;
             in_hold_d1 <= 0; in_hold_d2 <= 0;
             is_hold_blk_d1 <= 0; is_hold_blk_d2 <= 0;
-        end else begin
+        end 
+        else if(P == S_MAIN_GAME)begin
             // Stage 1: AGU
             addr_bg <= (pixel_y[9:1]) * VBUF_W + (pixel_x[9:1]);
             
@@ -218,7 +240,11 @@ module tetris_top(
     always @(*) begin
         if (!video_on) begin
             rgb_out = 12'h000;
-        end else begin
+        end 
+        else if(P == S_MAIN_IDLE) begin
+            rgb_out = data_bg;
+        end
+        else begin
             if (score_on_d2) rgb_out = 12'hFFF; 
             else if (in_game_d2 && blk_id_d2 > 0) rgb_out = data_blk; 
             else if (in_next_d2 && is_next_blk_d2) rgb_out = data_blk; 
