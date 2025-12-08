@@ -24,19 +24,19 @@ module tetris_top(
     localparam GAME_W = 200; 
     localparam GAME_H = 400; 
 
-    // 分數位置 (右上方)
+    // 分數位置
     localparam SC_X = 490;
     localparam SC_Y = 125;
 
-    // Next Piece 預覽區 (右側中間)
+    // Next Piece 預覽區
     localparam NEXT_X = 490; 
     localparam NEXT_Y = 220;
     localparam NEXT_W = 80;
     localparam NEXT_H = 80;
 
-    // Hold Piece 暫存區 (左下角)
+    // [修正] Hold Piece 暫存區 (X=80, Y=363)
     localparam HOLD_X = 80;
-    localparam HOLD_Y = 355;
+    localparam HOLD_Y = 363;
     localparam HOLD_W = 80;
     localparam HOLD_H = 80;
 
@@ -78,8 +78,8 @@ module tetris_top(
                            pixel_y >= OFF_Y && pixel_y < OFF_Y + GAME_H);
     wire [9:0] safe_grid_x = (in_game_region) ? (pixel_x - OFF_X) / 20 : 0;
     wire [9:0] safe_grid_y = (in_game_region) ? (pixel_y - OFF_Y) / 20 : 0;
-    wire [4:0] tex_u        = (in_game_region) ? (pixel_x - OFF_X) % 20 : 0;
-    wire [4:0] tex_v        = (in_game_region) ? (pixel_y - OFF_Y) % 20 : 0;
+    wire [4:0] tex_u       = (in_game_region) ? (pixel_x - OFF_X) % 20 : 0;
+    wire [4:0] tex_v       = (in_game_region) ? (pixel_y - OFF_Y) % 20 : 0;
 
     // Next Region
     wire in_next_region = (pixel_x >= NEXT_X && pixel_x < NEXT_X + NEXT_W && 
@@ -127,7 +127,6 @@ module tetris_top(
         ram_blk (.clk(clk_50m), .we(mem_we), .en(mem_en), .addr(addr_blk), .data_i(zero_data), .data_o(data_blk));
 
     // --- 8. Preview Bitmap Logic ---
-    // [優化] 4x4 Bitmap，盡量置中 (0為左, 3為右)
     function [15:0] get_preview_bitmap;
         input [2:0] shape;
         begin
@@ -183,7 +182,7 @@ module tetris_top(
             in_hold_d1 <= 0; in_hold_d2 <= 0;
             is_hold_blk_d1 <= 0; is_hold_blk_d2 <= 0;
         end else begin
-            // Stage 1: AGU
+            // AGU
             addr_bg <= (pixel_y[9:1]) * VBUF_W + (pixel_x[9:1]);
             
             if (in_next_region)
@@ -193,7 +192,7 @@ module tetris_top(
             else
                 addr_blk <= (core_blk_id * TEX_H + tex_v) * TEX_W + tex_u;
 
-            // Stage 2: Delay
+            // Delay
             blk_id_d1 <= core_blk_id;
             score_on_d1 <= score_active;
             in_game_d1 <= in_game_region;
@@ -202,7 +201,7 @@ module tetris_top(
             in_hold_d1 <= in_hold_region;
             is_hold_blk_d1 <= (in_hold_region && is_hold_pixel_on);
 
-            // Stage 3: Data Ready
+            // Data Ready
             blk_id_d2 <= blk_id_d1;
             score_on_d2 <= score_on_d1;
             in_game_d2 <= in_game_d1;
@@ -222,7 +221,6 @@ module tetris_top(
             if (score_on_d2) rgb_out = 12'hFFF; 
             else if (in_game_d2 && blk_id_d2 > 0) rgb_out = data_blk; 
             else if (in_next_d2 && is_next_blk_d2) rgb_out = data_blk; 
-            // [修正] 如果 hold_id 是 0 就不畫出來，避免畫出錯誤的圖案
             else if (in_hold_d2 && is_hold_blk_d2 && core_hold_id > 0) rgb_out = data_blk; 
             else rgb_out = data_bg;
         end

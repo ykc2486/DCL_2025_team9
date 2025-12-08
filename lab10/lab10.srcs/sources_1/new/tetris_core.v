@@ -47,7 +47,7 @@ module tetris_core (
 
     wire [25:0] drop_limit = (~btn[0]) ? TIME_DROP_FAST : TIME_DROP_SLOW;
 
-    // --- Geometry (函數保持不變) ---
+    // --- Geometry ---
     function [7:0] get_offset;
         input [2:0] shape; 
         input [1:0] rot; 
@@ -95,7 +95,7 @@ module tetris_core (
         end
     endfunction
 
-    // --- Collision Task (保持不變) ---
+    // --- Collision ---
     reg col_res;
     integer m;
     reg signed [3:0] tox, toy;
@@ -117,10 +117,11 @@ module tetris_core (
     endtask
 
     // --- FSM ---
-    integer i, j, k, cleared_count;
-    integer dst_row; 
-    reg signed [3:0] ox, oy;
+    integer check_row;
     reg full_row;
+    reg signed [3:0] ox, oy;
+    integer k, i, j;
+    integer loop_k; // [關鍵] 用於固定迴圈的變數
     
     reg [7:0] rand_reg;
     wire [2:0] random_val = (rand_reg[2:0] == 0) ? 1 : rand_reg[2:0];
@@ -132,17 +133,13 @@ module tetris_core (
             score <= 0;
             timer <= 0;
             rand_reg <= 8'hA5;
-            
-            // [恢復] Reset 時 Hold 為空
-            hold_piece <= 0; 
-            hold_used <= 0;
-
             next_piece_reg <= 1; 
+            hold_piece <= 0;
+            hold_used <= 0;
             cur_x <= 0; cur_y <= 0; cur_piece <= 1; cur_rot <= 0;
             for(i=0; i<ROWS; i=i+1) for(j=0; j<COLS; j=j+1) board[i][j] <= 0;
         end else begin
             rand_reg <= {rand_reg[6:0], rand_reg[7] ^ rand_reg[5]};
-            
             if (state == 1 && timer < drop_limit) timer <= timer + 1;
 
             case(state)
@@ -150,45 +147,66 @@ module tetris_core (
                     cur_piece <= next_piece_reg;
                     next_piece_reg <= random_val;
                     cur_x <= 4; cur_y <= 1; cur_rot <= 0;
-                    hold_used <= 0; // 重置 Hold 次數
+                    hold_used <= 0; 
                     
                     check_collision(4, 1, 0); 
                     if (col_res) begin 
                         for(i=0; i<ROWS; i=i+1) for(j=0; j<COLS; j=j+1) board[i][j] <= 0;
                         score <= 0;
-                        hold_piece <= 0; // Game Over 時也清空 Hold
+                        hold_piece <= 0;
                     end
                     state <= 1; timer <= 0;
                 end
 
                 1: begin // ACTIVE
+                    // [Hold 功能]
                     if (sw_change && !hold_used) begin
                         hold_used <= 1; 
                         timer <= 0; 
-                        
-                        // [修改] 交換後重置位置與旋轉
                         cur_x <= 4; 
                         cur_y <= 1; 
                         cur_rot <= 0; 
 
                         if (hold_piece == 0) begin
-                            // 第一次 Hold：存入當前，生成新的
                             hold_piece <= cur_piece;
                             cur_piece <= next_piece_reg;
                             next_piece_reg <= random_val;
                         end else begin
-                            // 有 Hold：交換
                             tmp_piece = cur_piece;
                             cur_piece <= hold_piece;
                             hold_piece <= tmp_piece;
                         end
                     end
 
-                    // 按鈕處理 (保持不變)
-                    if (btn_press[3]) begin
+                    // [Wall Kick]
+                    if (btn_press[3]) begin // Rot
                         check_collision(cur_x, cur_y, cur_rot + 1);
-                        if (!col_res) cur_rot <= cur_rot + 1;
+                        if (!col_res) begin
+                            cur_rot <= cur_rot + 1;
+                        end else begin
+                            // Try Right
+                            check_collision(cur_x + 1, cur_y, cur_rot + 1);
+                            if (!col_res) begin
+                                cur_rot <= cur_rot + 1;
+                                cur_x <= cur_x + 1;
+                            end else begin
+                                // Try Left
+                                check_collision(cur_x - 1, cur_y, cur_rot + 1);
+                                if (!col_res) begin
+                                    cur_rot <= cur_rot + 1;
+                                    cur_x <= cur_x - 1;
+                                end else begin
+                                    // Try Up
+                                    check_collision(cur_x, cur_y - 1, cur_rot + 1);
+                                    if (!col_res) begin
+                                        cur_rot <= cur_rot + 1;
+                                        cur_y <= cur_y - 1;
+                                    end
+                                end
+                            end
+                        end
                     end
+
                     if (btn_press[2]) begin // Left
                         check_collision(cur_x - 1, cur_y, cur_rot);
                         if (!col_res) cur_x <= cur_x - 1;
@@ -215,37 +233,48 @@ module tetris_core (
                         end
                     end
                     state <= 3;
+                    check_row <= ROWS - 1; // [Initialize check_row]
                 end
 
-                3: begin // CLEAR
-                    cleared_count = 0;
-                    for (i=0; i<ROWS; i=i+1) begin
-                        full_row = 1;
-                        for (j=0; j<COLS; j=j+1) if (board[i][j] == 0) full_row = 0;
-                        if (full_row) cleared_count = cleared_count + 1;
+                3: begin // CLEAR [修正：固定邊界迴圈]
+                    // 1. 檢查當前行
+                    full_row = 1;
+                    for (j=0; j<COLS; j=j+1) begin
+                        if (board[check_row][j] == 0) full_row = 0;
                     end
-                    if (cleared_count > 0) begin
-                        score <= score + cleared_count;
-                        dst_row = ROWS - 1; 
-                        for (i=ROWS-1; i>=0; i=i-1) begin
-                            full_row = 1;
-                            for (j=0; j<COLS; j=j+1) if (board[i][j] == 0) full_row = 0;
-                            if (!full_row) begin
-                                for (j=0; j<COLS; j=j+1) board[dst_row][j] <= board[i][j]; 
-                                dst_row = dst_row - 1; 
+
+                    if (full_row) begin
+                        score <= score + 1;
+                        
+                        // [關鍵修正] 使用固定常數範圍 (19 down to 1) 進行迴圈
+                        // 這是為了避免 Synthesis Loop Limit 錯誤
+                        for (loop_k = ROWS - 1; loop_k > 0; loop_k = loop_k - 1) begin
+                            // 只移動 check_row 之上的行
+                            if (loop_k <= check_row) begin
+                                for (j = 0; j < COLS; j = j + 1) begin
+                                    board[loop_k][j] <= board[loop_k - 1][j];
+                                end
                             end
                         end
-                        for (i=0; i<ROWS; i=i+1) begin
-                            if (i <= dst_row) for (j=0; j<COLS; j=j+1) board[i][j] <= 0; 
+                        
+                        // 頂部補零
+                        for (j = 0; j < COLS; j = j + 1) board[0][j] <= 0;
+                        
+                        // 滿行消除後，check_row 不動，再次檢查掉下來的這一行
+                    end else begin
+                        // 未滿行，指針上移
+                        if (check_row == 0) begin
+                            state <= 0; 
+                        end else begin
+                            check_row <= check_row - 1;
                         end
-                    end 
-                    state <= 0; 
+                    end
                 end
             endcase
         end
     end
 
-    // Rendering
+    // --- Rendering ---
     reg is_active_blk;
     integer n;
     reg signed [3:0] nox, noy;
@@ -253,6 +282,7 @@ module tetris_core (
     always @(*) begin
         pixel_block_id = 0;
         is_active_blk = 0;
+        
         if (state == 1 || state == 2) begin
             for (n=0; n<4; n=n+1) begin
                 {nox, noy} = get_offset(cur_piece, cur_rot, n[1:0]);
@@ -263,6 +293,7 @@ module tetris_core (
                 end
             end
         end
+        
         if (is_active_blk) pixel_block_id = cur_piece;
         else if (grid_x < COLS && grid_y < ROWS) pixel_block_id = board[grid_y][grid_x];
         else pixel_block_id = 0;
