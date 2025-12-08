@@ -1,14 +1,13 @@
 # TODO
 
 ## Problems
-- [ ] hold
+- [X] hold
 - [X] multi-row elimination
 - [ ] score
 - [ ] random blocks
 - [ ] rank
 - [ ] level-color
 - [ ] background
-- [ ] random obtacles
 - [X] next
 
 ## Expected-Feature
