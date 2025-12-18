@@ -20,7 +20,7 @@ module tetris_top(
     localparam TEX_W = 20; localparam TEX_H = 20;
     
     // UI 圖片尺寸
-    localparam START_W = 96; localparam START_H = 181;
+    localparam START_W = 96; localparam START_H = 150;
     localparam OVER_W  = 100; localparam OVER_H  = 54;
     
     // 圖片置中計算
@@ -32,10 +32,10 @@ module tetris_top(
     // 遊戲區塊位置
     localparam OFF_X = 240; localparam OFF_Y = 30;
     localparam GAME_W = 200; localparam GAME_H = 400; 
-    
+  
     // [UI 位置設定]
     localparam SC_X = 485; localparam SC_Y = 100;       // 分數 (Big Font 30x45)
-    localparam NEXT_X = 500; localparam NEXT_Y = 220;   // 下一個方塊
+    localparam NEXT_X = 505; localparam NEXT_Y = 220;   // 下一個方塊
     localparam NEXT_W = 80; localparam NEXT_H = 80;
     localparam HOLD_X = 80; localparam HOLD_Y = 370;    // Hold 方塊
     localparam HOLD_W = 80; localparam HOLD_H = 80;
@@ -103,7 +103,7 @@ module tetris_top(
         .game_status(core_status),
         .level(core_level)
     );
-
+    
     // --- [Rank Logic] ---
     wire [7:0] rk_r1, rk_r2, rk_r3, rk_r4, rk_r5;
     wire rank_pixel_on;
@@ -212,12 +212,12 @@ module tetris_top(
                 end
                 ST_GAMEOVER: begin
                     if (in_over_d2) rgb_out = data_over_d2;
-                    else if (rank_on_d2) rgb_out = 12'hFF0; // 排行榜：黃色
+                    else if (rank_on_d2) rgb_out = 12'h770; // 排行榜：黃色
                     else rgb_out = (in_game_d2 && blk_id_d2 > 0) ? {4'hF, 4'h0, 4'h0} : ({data_bg[11:8]>>1, data_bg[7:4]>>1, data_bg[3:0]>>1});
                 end
-                ST_PAUSE: begin
-                    if (in_game_d2 && blk_id_d2 > 0) rgb_out = data_blk; else rgb_out = data_bg; 
-                end
+//                ST_PAUSE: begin
+//                    if (in_game_d2 && blk_id_d2 > 0) rgb_out = data_blk; else rgb_out = data_bg; 
+//                end
                 default: begin 
                     if (score_on_d2) rgb_out = 12'hFFF;       // 分數 (大)：白色
                     else if (level_on_d2) rgb_out = 12'h0FF;  // Level (小)：青色
