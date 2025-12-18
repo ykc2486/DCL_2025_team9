@@ -1,5 +1,5 @@
 module tetris_core (
-    input  wire       clk,            // 50MHz (from divider)
+    input  wire       clk,            // 50MHz
     input  wire       rst,
     input  wire [3:0] btn,            // {3:Rot, 2:Left, 1:Right, 0:Down/Start}
     input  wire       sw_hold,        // sw[0]: Hold
@@ -13,7 +13,6 @@ module tetris_core (
     output wire [2:0] game_status,    // 0:IDLE, 1:SPAWN, 2:ACTIVE, 3:LOCK, 4:CLEAR, 5:OVER, 6:PAUSE
     output reg  [7:0] level           // Output Level
 );
-
     // --- Parameters ---
     parameter COLS = 10;
     parameter ROWS = 20;
@@ -36,6 +35,11 @@ module tetris_core (
     reg [1:0] cur_rot;
     integer   cur_x, cur_y;
 
+    // --- T-Spin Logic Variables ---
+    reg last_op_rotate;     // 1 if the last successful action was a rotation
+    reg t_spin_achieved;    // 1 if T-Spin conditions met at LOCK
+    integer corner_cnt;     // Counter for occupied corners
+
     // --- Next & Hold ---
     reg [2:0] next_piece_reg;
     assign next_piece_id = next_piece_reg;
@@ -46,14 +50,13 @@ module tetris_core (
 
     // --- [Speed Control] ---
     // Assuming clk is 50MHz
-    // 0.1s = 50,000,000 * 0.1 = 5,000,000 ticks
-    localparam TIME_DROP_FAST = 5000000;   // Down key speed (0.1s)
-    localparam TIME_BASE      = 25000000;  // Base speed (0.5s)
-    localparam TIME_STEP      = 5000000;   // Speed increase step (0.1s)
-    localparam TIME_MIN       = 2500000;   // Max speed limit (0.05s)
+    localparam TIME_DROP_FAST = 5000000;   // 0.1s
+    localparam TIME_BASE      = 25000000;  // 0.5s
+    localparam TIME_STEP      = 5000000;   // 0.1s
+    localparam TIME_MIN       = 2500000;   // 0.05s
 
     reg  [25:0] current_speed_limit;
-    wire [7:0]  speed_stage = level; // Every 3 levels is a speed stage
+    wire [7:0]  speed_stage = level;
 
     always @(*) begin
         // Formula: Speed = Base - (Stage * 0.1s)
@@ -116,7 +119,7 @@ module tetris_core (
                 end
                 2: begin // J-Piece
                     case (rot)
-                        0: case(idx)
+                         0: case(idx)
                                0: {dx, dy} = {-4'sd1, -4'sd1};
                                1: {dx, dy} = {-4'sd1,  4'sd0};
                                2: {dx, dy} = { 4'sd0,  4'sd0};
@@ -144,7 +147,7 @@ module tetris_core (
                 end
                 3: begin // L-Piece
                     case (rot)
-                        0: case(idx)
+                         0: case(idx)
                                0: {dx, dy} = { 4'sd1, -4'sd1};
                                1: {dx, dy} = {-4'sd1,  4'sd0};
                                2: {dx, dy} = { 4'sd0,  4'sd0};
@@ -172,10 +175,10 @@ module tetris_core (
                 end
                 4: begin // O-Piece
                     case (idx)
-                        0: {dx, dy} = { 4'sd0, 4'sd0};
-                        1: {dx, dy} = { 4'sd1, 4'sd0};
-                        2: {dx, dy} = { 4'sd0, 4'sd1};
-                        3: {dx, dy} = { 4'sd1, 4'sd1};
+                         0: {dx, dy} = { 4'sd0, 4'sd0};
+                         1: {dx, dy} = { 4'sd1, 4'sd0};
+                         2: {dx, dy} = { 4'sd0, 4'sd1};
+                         3: {dx, dy} = { 4'sd1, 4'sd1};
                     endcase
                 end
                 5: begin // S-Piece
@@ -196,35 +199,35 @@ module tetris_core (
                 end
                 6: begin // T-Piece
                     case (rot)
-                        0: case(idx)
+                         0: case(idx)
                                0: {dx, dy} = { 4'sd0, -4'sd1};
                                1: {dx, dy} = {-4'sd1,  4'sd0};
-                               2: {dx, dy} = { 4'sd0,  4'sd0};
+                               2: {dx, dy} = { 4'sd0,  4'sd0}; // Center
                                3: {dx, dy} = { 4'sd1,  4'sd0};
                            endcase
                         1: case(idx)
                                0: {dx, dy} = { 4'sd0, -4'sd1};
-                               1: {dx, dy} = { 4'sd0,  4'sd0};
+                               1: {dx, dy} = { 4'sd0,  4'sd0}; // Center
                                2: {dx, dy} = { 4'sd1,  4'sd0};
                                3: {dx, dy} = { 4'sd0,  4'sd1};
                            endcase
                         2: case(idx)
                                0: {dx, dy} = {-4'sd1,  4'sd0};
-                               1: {dx, dy} = { 4'sd0,  4'sd0};
+                               1: {dx, dy} = { 4'sd0,  4'sd0}; // Center
                                2: {dx, dy} = { 4'sd1,  4'sd0};
                                3: {dx, dy} = { 4'sd0,  4'sd1};
                            endcase
                         3: case(idx)
                                0: {dx, dy} = { 4'sd0, -4'sd1};
                                1: {dx, dy} = {-4'sd1,  4'sd0};
-                               2: {dx, dy} = { 4'sd0,  4'sd0};
+                               2: {dx, dy} = { 4'sd0,  4'sd0}; // Center
                                3: {dx, dy} = { 4'sd0,  4'sd1};
                            endcase
                     endcase
                 end
                 7: begin // Z-Piece
                     case (rot[0])
-                        0: case(idx)
+                         0: case(idx)
                                0: {dx, dy} = {-4'sd1, 4'sd0};
                                1: {dx, dy} = { 4'sd0, 4'sd0};
                                2: {dx, dy} = { 4'sd0, 4'sd1};
@@ -267,6 +270,7 @@ module tetris_core (
     endtask
     
     reg [31:0] rand_timer;
+
     // --- Main FSM ---
     always @(posedge clk) begin
         if (rst) begin
@@ -281,7 +285,10 @@ module tetris_core (
             hold_piece <= 0;
             hold_used <= 0;
             init_timer <= 0;
-            cur_x <= 0; cur_y <= 0; cur_piece <= 1; cur_rot <= 0;
+            cur_x <= 0; cur_y <= 0;
+            cur_piece <= 1; cur_rot <= 0;
+            last_op_rotate <= 0;
+            t_spin_achieved <= 0;
             for (i=0; i<ROWS; i=i+1) 
                 for (j=0; j<COLS; j=j+1) 
                     board[i][j] <= 0;
@@ -301,12 +308,13 @@ module tetris_core (
                 rand_timer <= 0;
                 rand_reg <= (rand_reg << 3) ^ rand_reg;
             end
+
             case (state)
                 S_IDLE: begin
                     if (init_timer < 100000000) begin
                         init_timer <= init_timer + 1;
                     end else begin
-                        rand_reg <= rand_reg + 1; // Increase random seed variation
+                        rand_reg <= rand_reg + 1;
                         if (btn_press[0]) begin
                             score <= 0;
                             level <= 0;
@@ -323,6 +331,8 @@ module tetris_core (
                     next_piece_reg <= random_val;
                     cur_x <= 4; cur_y <= 1; cur_rot <= 0;
                     hold_used <= 0;
+                    last_op_rotate <= 0; // Reset rotate flag
+                    t_spin_achieved <= 0; // Reset T-Spin flag
                     check_collision(4, 0, 0);
                     if (col_res) state <= S_GAMEOVER;
                     else begin
@@ -336,11 +346,12 @@ module tetris_core (
                         state <= S_PAUSE;
                     end else begin
                         if (timer < drop_limit) timer <= timer + 1;
-
+                        
                         // Hold Functionality
                         if (sw_change && !hold_used) begin
                             hold_used <= 1;
                             timer <= 0;
+                            last_op_rotate <= 0; // Holding resets T-spin status
                             cur_x <= 4; cur_y <= 1; cur_rot <= 0;
                             if (hold_piece == 0) begin
                                 hold_piece <= cur_piece;
@@ -355,49 +366,61 @@ module tetris_core (
 
                         // Rotate Logic (with wall kicks)
                         if (btn_press[3]) begin
-                            check_collision(cur_x, cur_y, cur_rot + 1);
-                            if (!col_res) begin
-                                cur_rot <= cur_rot + 1;
-                            end else begin
-                                // Kick Right
-                                check_collision(cur_x + 1, cur_y, cur_rot + 1);
-                                if (!col_res) begin
-                                    cur_rot <= cur_rot + 1;
-                                    cur_x <= cur_x + 1;
-                                end else begin
-                                    // Kick Left
-                                    check_collision(cur_x - 1, cur_y, cur_rot + 1);
-                                    if (!col_res) begin
-                                        cur_rot <= cur_rot + 1;
-                                        cur_x <= cur_x - 1;
-                                    end else begin
-                                        // Kick Up (Floor kick)
-                                        check_collision(cur_x, cur_y - 1, cur_rot + 1);
-                                        if (!col_res) begin
-                                            cur_rot <= cur_rot + 1;
-                                            cur_y <= cur_y - 1;
-                                        end
-                                    end
-                                end
-                            end
+                             check_collision(cur_x, cur_y, cur_rot + 1);
+                             if (!col_res) begin
+                                 cur_rot <= cur_rot + 1;
+                                 last_op_rotate <= 1; // Mark as rotation
+                             end else begin
+                                 // Kick Right
+                                 check_collision(cur_x + 1, cur_y, cur_rot + 1);
+                                 if (!col_res) begin
+                                     cur_rot <= cur_rot + 1;
+                                     cur_x <= cur_x + 1;
+                                     last_op_rotate <= 1; // Mark as rotation
+                                 end else begin
+                                     // Kick Left
+                                     check_collision(cur_x - 1, cur_y, cur_rot + 1);
+                                     if (!col_res) begin
+                                         cur_rot <= cur_rot + 1;
+                                         cur_x <= cur_x - 1;
+                                         last_op_rotate <= 1; // Mark as rotation
+                                     end else begin
+                                         // Kick Up (Floor kick)
+                                         check_collision(cur_x, cur_y - 1, cur_rot + 1);
+                                         if (!col_res) begin
+                                             cur_rot <= cur_rot + 1;
+                                             cur_y <= cur_y - 1;
+                                             last_op_rotate <= 1; // Mark as rotation
+                                         end
+                                     end
+                                 end
+                             end
                         end
 
                         // Move Left/Right
                         if (btn_press[2]) begin
                             check_collision(cur_x - 1, cur_y, cur_rot);
-                            if (!col_res) cur_x <= cur_x - 1;
+                            if (!col_res) begin 
+                                cur_x <= cur_x - 1;
+                                last_op_rotate <= 0; // Move cancels T-spin
+                            end
                         end
                         if (btn_press[1]) begin
                             check_collision(cur_x + 1, cur_y, cur_rot);
-                            if (!col_res) cur_x <= cur_x + 1;
+                            if (!col_res) begin 
+                                cur_x <= cur_x + 1;
+                                last_op_rotate <= 0; // Move cancels T-spin
+                            end
                         end
 
                         // Gravity
                         if (timer >= drop_limit) begin
                             timer <= 0;
                             check_collision(cur_x, cur_y + 1, cur_rot);
-                            if (!col_res) cur_y <= cur_y + 1;
-                            else state <= S_LOCK;
+                            if (!col_res) begin
+                                cur_y <= cur_y + 1;
+                                last_op_rotate <= 0; // Drop cancels T-spin
+                            end else state <= S_LOCK;
                         end
                     end
                 end
@@ -407,6 +430,35 @@ module tetris_core (
                 end
 
                 S_LOCK: begin
+                    // --- T-Spin Detection Logic ---
+                    if (cur_piece == 6 && last_op_rotate) begin
+                        corner_cnt = 0;
+                        // Check 4 corners. Count if occupied (Wall, Floor, or Block)
+                        
+                        // Top-Left (x-1, y-1)
+                        if (cur_x - 1 < 0 || cur_y - 1 >= ROWS) corner_cnt = corner_cnt + 1;
+                        else if (cur_y - 1 >= 0 && board[cur_y-1][cur_x-1] != 0) corner_cnt = corner_cnt + 1;
+
+                        // Top-Right (x+1, y-1)
+                        if (cur_x + 1 >= COLS || cur_y - 1 >= ROWS) corner_cnt = corner_cnt + 1;
+                        else if (cur_y - 1 >= 0 && board[cur_y-1][cur_x+1] != 0) corner_cnt = corner_cnt + 1;
+
+                        // Bottom-Left (x-1, y+1)
+                        if (cur_x - 1 < 0 || cur_y + 1 >= ROWS) corner_cnt = corner_cnt + 1;
+                        else if (cur_y + 1 >= 0 && board[cur_y+1][cur_x-1] != 0) corner_cnt = corner_cnt + 1;
+
+                        // Bottom-Right (x+1, y+1)
+                        if (cur_x + 1 >= COLS || cur_y + 1 >= ROWS) corner_cnt = corner_cnt + 1;
+                        else if (cur_y + 1 >= 0 && board[cur_y+1][cur_x+1] != 0) corner_cnt = corner_cnt + 1;
+
+                        // Rule: At least 3 corners occupied
+                        if (corner_cnt >= 3) t_spin_achieved <= 1;
+                        else t_spin_achieved <= 0;
+                    end else begin
+                        t_spin_achieved <= 0;
+                    end
+                    // --------------------------------
+
                     for (k=0; k<4; k=k+1) begin
                         {ox, oy} = get_offset(cur_piece, cur_rot, k[1:0]);
                         if ((cur_y+oy)>=0 && (cur_y+oy)<ROWS && (cur_x+ox)>=0 && (cur_x+ox)<COLS)
@@ -443,14 +495,20 @@ module tetris_core (
                             // Shift lines down
                             for (loop_k = ROWS-1; loop_k > 0; loop_k = loop_k - 1) begin
                                 if (loop_k <= check_row) begin
-                                    for (j=0; j<COLS; j=j+1) board[loop_k][j] <= board[loop_k-1][j];
+                                     for (j=0; j<COLS; j=j+1) board[loop_k][j] <= board[loop_k-1][j];
                                 end
                             end
                             for (j=0; j<COLS; j=j+1) board[0][j] <= 0;
-
                         end else if (check_row == 0) begin
                             state <= S_SPAWN;
-                            score <= score + tmp_score;
+                            // [Score Update with T-Spin Bonus]
+                            if (t_spin_achieved) begin
+                                // 4x Multiplier for T-Spin clears
+                                // Example: T-Spin Single (1->4), Double (3->12)
+                                score <= score + (tmp_score << 2); 
+                            end else begin
+                                score <= score + tmp_score;
+                            end
                             tmp_score <= 0;
                         end else begin
                             check_row <= check_row - 1;
