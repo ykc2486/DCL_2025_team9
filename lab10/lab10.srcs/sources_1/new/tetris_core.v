@@ -65,7 +65,7 @@ module tetris_core (
     end
 
     reg  [25:0] timer;
-    wire [25:0] drop_limit = (~btn[0]) ? TIME_DROP_FAST : current_speed_limit;
+    wire [25:0] drop_limit = (~btn[0]) ? current_speed_limit / 5 : current_speed_limit;
 
     // --- [Line Count] ---
     reg [5:0] lines_cleared_accumulator;
@@ -299,7 +299,7 @@ module tetris_core (
             end
             else begin
                 rand_timer <= 0;
-                rand_reg <= rand_reg + 1;
+                rand_reg <= (rand_reg << 3) ^ rand_reg;
             end
             case (state)
                 S_IDLE: begin

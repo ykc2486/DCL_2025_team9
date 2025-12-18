@@ -4,7 +4,7 @@
 <!-- Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.                   -->
 <!-- Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.   -->
 
-<Project Product="Vivado" Version="7" Minor="70" Path="D:/digital_design/DCL_2025_team9/lab10/lab10.xpr">
+<Project Product="Vivado" Version="7" Minor="70" Path="D:/DCL_2025_team9/lab10/lab10.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="d574fc4cba9e4cad8bf7001a1752cd7b"/>
